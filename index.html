@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fix the Page: fix the page you are on, only when you ask</title>
+<meta name="description" content="A Chrome extension that fixes the page you are on, only when you ask: one generic extension built on activeTab, starting with the tab&#x27;s title. No network, no telemetry. Install from the repository or the zip, and read the source.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/index.html">
+<meta property="og:title" content="Fix the Page: fix the page you are on, only when you ask">
+<meta property="og:description" content="A Chrome extension that fixes the page you are on, only when you ask: one generic extension built on activeTab, starting with the tab&#x27;s title. No network, no telemetry. Install from the repository or the zip, and read the source.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="install/index.html">Install</a>
+  <a class="nl" href="use/title/index.html">The title fix</a>
+  <a class="nl" href="permissions/index.html">Permissions</a>
+  <a class="nl" href="privacy/index.html">Privacy</a>
+  <a class="nl" href="source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<header class="hero">
+  <div class="eyebrow">Chrome extension · Manifest V3 · activeTab</div>
+  <h1>Fix the page you are on. Only when you ask.</h1>
+  <p class="sub">One generic extension that can fix any kind of site, built on <code>activeTab</code>. It touches a tab only when you invoke it there, it keeps nothing it does not need, and it can say exactly what it changed. Version 0.1 ships one fix, done properly: the tab's title.</p>
+  <div class="ctas">
+    <a class="cta1" href="install/index.html">Install from the repo or the zip &rarr;</a>
+    <a class="cta2" href="use/title/index.html">The title fix &rarr;</a>
+    <a class="cta2" href="source/index.html">Read the source &rarr;</a>
+  </div>
+</header>
+
+<section class="band" id="rule">
+  <h2>The one rule</h2>
+  <blockquote class="rule-box">The extension touches a page only because the user asked it to, on that page, and it can say exactly what it changed.<span class="who">Everything else follows from it: <code>activeTab</code> instead of host permissions, fixes as rules rather than code, per-site opt-in for persistence, a visible list of every rule and every site with access, and no network calls at all.</span></blockquote>
+</section>
+
+<section class="band alt" id="what">
+  <h2>What version 0.1 does</h2>
+  <p class="blurb">Set a tab's title to a value you choose. Useful when ten tabs of the same web app all say the same thing, when a title is too long to read in a tab strip, or when a dashboard should say what it is for.</p>
+  <div class="cards">
+    <a class="card" href="use/title/index.html"><span class="tag">Built</span><h3>Set this tab's title</h3><p>Click the icon, type, Apply. The tab says what you typed, now, even on a single-page app that keeps rewriting its own title. It lasts until you leave or reload the page.</p><span class="go">How &rarr;</span></a>
+    <a class="card" href="use/title/index.html#always"><span class="tag">Built</span><h3>Keep it, on one site</h3><p>Tick "Always on this site". Chrome asks you to allow that one site. From then on the title is applied on every visit to matching pages, with no further clicks.</p><span class="go">How &rarr;</span></a>
+    <a class="card" href="use/title/index.html#rules"><span class="tag">Built</span><h3>Review, edit, undo</h3><p>"My rules" lists every rule and every site with access, each with a remove button. Export and import your rules as a JSON file. Undo on any page in one click.</p><span class="go">How &rarr;</span></a>
+    <a class="card" href="permissions/index.html"><span class="tag">Built</span><h3>Say exactly what it may touch</h3><p>Four permissions, each explained with Chrome's own words. No host permissions at install, no remote code, no network. The validator in the repo refuses a build that breaks any of this.</p><span class="go">The permissions &rarr;</span></a>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <h2>How a fix reaches a page</h2>
+  <p class="blurb">Two routes, and the extension tells you which one it is using.</p>
+  <div class="cards">
+    <div class="card"><span class="tag">On demand · the default</span><h3><code>activeTab</code></h3><p>Chrome's documentation: the permission "gives an extension temporary access to the currently active tab when the user invokes the extension", and "access to the tab lasts while the user is on that page, and is revoked when the user navigates away or closes the tab". Clicking the icon, the keyboard shortcut and the context menu item are the gestures that grant it. Nothing is granted at install, and Chrome shows no install warning.</p></div>
+    <div class="card"><span class="tag">Persistent · per site · opt-in</span><h3><code>optional_host_permissions</code></h3><p>When you tick "Always on this site", the extension asks Chrome for that one origin, and Chrome shows its own prompt. If you agree, the engine is registered for that origin only and runs at page load to apply your rules. The options page lists every such site, and Remove access takes it back in one click.</p></div>
+  </div>
+</section>
+
+<section class="band alt" id="not">
+  <h2>What it does not do</h2>
+  <div class="cards">
+    <div class="card"><h3>No standing access to the web</h3><p>No <code>host_permissions</code> in the manifest, no <code>&lt;all_urls&gt;</code>, no <code>tabs</code>, <code>history</code>, <code>cookies</code>, <code>webRequest</code> or <code>debugger</code>. The validator rejects a manifest that asks for any of them.</p></div>
+    <div class="card"><h3>No code from anywhere else</h3><p>Fixes are data: a rule names a bundled fix and a value. The bundled engine interprets it. No <code>eval</code>, no <code>new Function</code>, no scripts from the web, nothing executed from an import file.</p></div>
+    <div class="card"><h3>No network, no telemetry</h3><p>The extension's own pages run under a Content Security Policy with <code>connect-src 'none'</code>. The validator refuses any <code>fetch</code>, <code>XMLHttpRequest</code> or <code>WebSocket</code> in the code. Rules live in your browser; export and import go through files you choose.</p></div>
+    <div class="card"><h3>Nothing of the page but what the fix needs</h3><p>It reads the URL, to match rules, and the title, to replace it. It never reads form fields, cookies or page text, and never stores them.</p></div>
+  </div>
+  <p class="blurb" style="margin-top:1.4rem;margin-bottom:0"><a href="privacy/index.html">The privacy page, in full &rarr;</a></p>
+</section>
+
+<section class="band" id="from">
+  <h2>Where this comes from</h2>
+  <p class="blurb">The newsroom article <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">Fix the page yourself</a> (17 October 2026) argues that the next user experience is the one the user customises, prefers fixes "the reader is the one who clicks" for, and says plainly that its author does not like "one extension with access to every site I visit". This extension reconciles the two: generic in what it can do, narrow in what it may touch at any moment. It is a child of the <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a> hub and follows its guides, including the one on build provenance: the options page shows the version, the commit and the build time, because "running an old build" is the hub's first silent failure.</p>
+  <div class="ratio">
+    <div class="stat"><b>1</b><span>fix shipped: the title</span></div>
+    <div class="stat"><b>4</b><span>permissions, each explained</span></div>
+    <div class="stat"><b>0</b><span>network calls</span></div>
+  </div>
+</section>
+
+<section class="band alt" id="next">
+  <h2>After the title</h2>
+  <p class="blurb">A proposed order, none of it started without Dinis's word. Each would be a release of its own.</p>
+  <div class="cards">
+    <div class="card"><span class="tag">Proposed</span><h3>The newsroom's fixes, generically</h3><p>Bigger text, high contrast and text spacing are CSS only, so safe on any site. Outline reads headings. Reading mode guesses, so best-effort. On a site that publishes <code>window.__tools.page</code>, call its fixes by name instead.</p></div>
+    <div class="card"><span class="tag">Proposed</span><h3>Hide an element</h3><p>A rule with a CSS selector. The most common user fix: banners and sticky bars. Selectors are data, and get validated.</p></div>
+    <div class="card"><span class="tag">Proposed</span><h3>Rule packs and signed rules</h3><p>Share a set of rules for a site as a file or from an sgit vault; later, sign them with a key the pki.sgit.ai register vouches for.</p></div>
+    <div class="card"><span class="tag">Out of scope by design</span><h3>Arbitrary user JavaScript</h3><p>That is a userscript manager, which needs Chrome's userScripts API and a developer toggle. It breaks the one rule.</p></div>
+  </div>
+  <div style="max-width:960px;margin:1.4rem auto 0;padding:0 1.1rem"><p class="small dim">Status marks on this site: <span class="status status-built">built</span> is in this release and tested; <span class="status status-spec">specified</span> is written down in the brief and not yet built; <span class="status status-proposed">proposed</span> is an idea for Dinis to accept or refuse.</p></div>
+</section>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="admin/versions.html" data-site-version>v0.1.0</a> · <a href="releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="install/index.html">Install</a>
+    <a href="use/title/index.html">The title fix</a>
+    <a href="permissions/index.html">Permissions</a>
+    <a href="privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="source/index.html">Source and releases</a>
+    <a href="admin/versions.html">Release history</a>
+    <a href="admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="assets/version.js"></script>
+</body>
+</html>

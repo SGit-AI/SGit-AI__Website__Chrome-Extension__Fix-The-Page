@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Original</title></head>
+<body><h1>A page that replaces its title element</h1>
+<script>
+  // Not document.title = x, but a new <title> node in place of the old one.
+  window.replaceTitle = function (text) {
+    var old = document.querySelector('title');
+    var t = document.createElement('title');
+    t.textContent = text;
+    if (old) old.replaceWith(t); else document.head.appendChild(t);
+  };
+</script>
+</body></html>

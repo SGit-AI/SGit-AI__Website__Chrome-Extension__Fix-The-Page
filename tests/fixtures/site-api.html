@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>A site with a page API</title></head>
+<body><h1>This page publishes window.__tools.page</h1>
+<script>
+  // The shape of the newsroom's page-fixes.js API, enough for detection.
+  (function () {
+    var on = {};
+    var FIXES = { reading: 'Reading mode', bigger: 'Bigger text', contrast: 'High contrast' };
+    function list() { return Object.keys(FIXES).map(function (k) { return { name: k, title: FIXES[k], on: !!on[k] }; }); }
+    window.__tools = window.__tools || {};
+    window.__tools.page = {
+      meta: { name: 'page-fixes', version: '0.1.0', site: location.host },
+      list: list,
+      apply: function (name, v) { on[name] = v === undefined ? true : !!v; return list(); },
+      toggle: function (name) { on[name] = !on[name]; return list(); },
+      reset: function () { on = {}; return list(); }
+    };
+    window.dispatchEvent(new CustomEvent('tool:ready', { detail: { name: 'page' } }));
+  })();
+</script>
+</body></html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How this site is built · Fix the Page</title>
+<meta name="description" content="How fix-the-page.chrome-extensions.sgit.ai is built and released: the agent and its policy, the validate, test, tag and deploy pipeline, the release recipe, and what needs a human.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/admin/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/admin/index.html">
+<meta property="og:title" content="How this site is built · Fix the Page">
+<meta property="og:description" content="How fix-the-page.chrome-extensions.sgit.ai is built and released: the agent and its policy, the validate, test, tag and deploy pipeline, the release recipe, and what needs a human.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../permissions/index.html">Permissions</a>
+  <a class="nl" href="../privacy/index.html">Privacy</a>
+  <a class="nl" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / admin</div>
+<h1>How this site is built</h1>
+<p class="lead">For the agent that maintains this repository, and for anyone checking its work. The site is static HTML on GitHub Pages; the extension is the <code>extension/</code> folder; one pipeline validates, tests, tags and deploys both.</p>
+
+<h2 id="agent">The agent and its policy</h2>
+<p>This repository is maintained by a dedicated Claude Code session, <code>fix-the-page.dev</code>, under an Agent Behaviour Policy written in the briefing pack of 24 October 2026. In short: push only to this repository's release branch; read the hub and the newsroom but never push to them; <code>activeTab</code> is the only standing access; no remotely hosted code; no network calls from the extension; read nothing from a page but what a fix needs; never commit a secret; version everything; never push a red build; cite Chrome's documentation for every fact about Chrome; British English, no em-dashes, no superlatives about our own work; contact nobody. Dinis Cruz is the editor and owner, and when the pack and Dinis disagree, Dinis wins.</p>
+
+<h2 id="pipeline">The pipeline</h2>
+<p><code>.github/workflows/deploy-pages.yml</code>, copied from the hub with one job added. On every push to <code>dev</code>:</p>
+<ol>
+  <li><b>validate:</b> <code>node admin/build/validate.js</code>. A failure stops everything.</li>
+  <li><b>test:</b> <code>node tests/run.mjs</code>, with Playwright and Chromium installed on the runner.</li>
+  <li><b>tag-release:</b> reads <code>admin/build/version.txt</code>, finds the release commit (<code>site vX.Y.Z: …</code>), checks the two agree and that the bump is the next minor (or a deliberate major), and pushes the tag.</li>
+  <li><b>deploy:</b> publishes the tree to GitHub Pages.</li>
+</ol>
+
+<h2 id="recipe">The release recipe</h2>
+<pre class="shell"><span class="g">$</span> git pull --ff-only origin dev
+<span class="d"># bump admin/build/version.txt once; set extension/manifest.json and package.json to match</span>
+<span class="g">$</span> node admin/build/package.mjs        <span class="d"># stamps build.json, builds the zip and .sha256, re-points the pages</span>
+<span class="g">$</span> npm test
+<span class="g">$</span> node admin/build/validate.js
+<span class="d"># add a row to admin/versions.html; write admin/debriefs/YYYY-MM-DD.md</span>
+<span class="g">$</span> git commit -am "site vX.Y.Z: what changed"
+<span class="g">$</span> git push origin dev</pre>
+
+<h2 id="human">What needs a human</h2>
+<ul>
+  <li>DNS: a CNAME record for <code>fix-the-page.chrome-extensions</code> pointing at GitHub Pages.</li>
+  <li>GitHub Pages: enabling it on the repository, and allowing <code>dev</code> in the <code>github-pages</code> environment.</li>
+  <li>The Chrome Web Store: any publication there. Not in v0.1.</li>
+  <li>The three manual acceptance checks before a release that touches the popup, the permissions or the engine; see <a href="../source/index.html#tests">the tests</a>.</li>
+</ul>
+
+<h2 id="debriefs">Debriefs</h2>
+<p>One per working session, in <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page/tree/dev/admin/debriefs"><code>admin/debriefs/</code></a>: what shipped, what failed and why, what is next. The next session reads the latest one first.</p>
+
+<div class="pagenav">
+  <a href="versions.html">&larr; Release history</a>
+  <a href="../index.html">Home &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>

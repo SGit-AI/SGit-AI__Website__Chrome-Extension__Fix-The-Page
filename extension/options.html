@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My rules · Fix the Page</title>
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<header class="top">
+  <h1>Fix the Page: my rules</h1>
+  <p class="dim">Every fix you keep, every site this extension may touch without a click, and the buttons to take each one away. Nothing on this page leaves your browser.</p>
+</header>
+
+<main>
+  <section id="rules-section" aria-labelledby="rules-h">
+    <div class="sechead">
+      <h2 id="rules-h">Rules</h2>
+      <div class="tools">
+        <button id="export" type="button">Export</button>
+        <label class="btn" for="import-file">Import<input id="import-file" type="file" accept="application/json,.json"></label>
+      </div>
+    </div>
+    <p id="rules-empty" class="empty" hidden>No rules yet. Click the Fix the Page icon on a page, type a title and tick "Always on this site".</p>
+    <div id="rules"></div>
+    <p id="rules-message" class="message" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="sites-section" aria-labelledby="sites-h">
+    <h2 id="sites-h">Sites with access</h2>
+    <p class="dim">Each site here was allowed by you, one at a time, through Chrome's own prompt. The engine runs on every page of a listed site to apply your rules. Remove access and it stops at once.</p>
+    <p id="sites-empty" class="empty" hidden>No site has standing access. The extension only touches a tab when you click it there.</p>
+    <ul id="sites" class="sites"></ul>
+    <p id="sites-message" class="message" role="status" aria-live="polite"></p>
+  </section>
+
+  <section aria-labelledby="about-h">
+    <h2 id="about-h">About this build</h2>
+    <dl class="build">
+      <dt>Version</dt><dd id="b-version"></dd>
+      <dt>Built from commit</dt><dd id="b-commit"></dd>
+      <dt>Built at</dt><dd id="b-time"></dd>
+      <dt>Shortcut</dt><dd id="b-shortcut"></dd>
+    </dl>
+    <p class="dim small">Source, releases and the manual: <a href="https://fix-the-page.chrome-extensions.sgit.ai/" target="_blank" rel="noopener">fix-the-page.chrome-extensions.sgit.ai</a>.</p>
+  </section>
+</main>
+
+<template id="rule-row">
+  <article class="rule">
+    <div class="rule-view">
+      <div class="rule-main">
+        <span class="rule-value"></span>
+        <span class="rule-mode"></span>
+      </div>
+      <code class="rule-match"></code>
+      <div class="rule-actions">
+        <label class="switch"><input type="checkbox" class="rule-enabled"> <span>Enabled</span></label>
+        <button type="button" class="rule-edit">Edit</button>
+        <button type="button" class="rule-delete danger">Delete</button>
+      </div>
+    </div>
+    <form class="rule-form" hidden>
+      <label>Title <input name="value" type="text" maxlength="500"></label>
+      <label>How
+        <select name="mode">
+          <option value="set">Set</option><option value="prefix">Prefix</option><option value="suffix">Suffix</option><option value="template">Template</option>
+        </select>
+      </label>
+      <label>Where <input name="match" type="text" maxlength="1000" class="mono"></label>
+      <div class="rule-actions">
+        <button type="submit" class="primary">Save</button>
+        <button type="button" class="rule-cancel">Cancel</button>
+        <span class="form-error" role="alert"></span>
+      </div>
+    </form>
+  </article>
+</template>
+
+<script src="engine.js"></script>
+<script src="build.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

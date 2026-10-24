@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Permissions · Fix the Page</title>
+<meta name="description" content="Every permission Fix the Page asks for, why, what it can and cannot do, in Chrome&#x27;s own words: activeTab, scripting, storage, contextMenus, and optional host permissions granted one site at a time. And the ones it does not ask for.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/permissions/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/permissions/index.html">
+<meta property="og:title" content="Permissions · Fix the Page">
+<meta property="og:description" content="Every permission Fix the Page asks for, why, what it can and cannot do, in Chrome&#x27;s own words: activeTab, scripting, storage, contextMenus, and optional host permissions granted one site at a time. And the ones it does not ask for.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl here" href="../permissions/index.html">Permissions</a>
+  <a class="nl" href="../privacy/index.html">Privacy</a>
+  <a class="nl" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / permissions</div>
+<h1>Permissions</h1>
+<p class="lead">Four permissions and one optional one. Each is here with what it is for, what it lets the extension do, what it does not, and Chrome's own description of it, fetched from <a href="https://developer.chrome.com/docs/extensions">developer.chrome.com</a> on 24 October 2026. Chrome's documentation changes; the links go to the current page.</p>
+
+<div class="note"><b>The manifest, as shipped.</b> <code>"permissions": ["activeTab", "scripting", "storage", "contextMenus"]</code> and <code>"optional_host_permissions": ["https://*/*", "http://*/*"]</code>. No <code>host_permissions</code>. The <a href="../source/index.html#validator">validator</a> rejects a build whose manifest says anything else.</div>
+
+<div class="perm" id="activetab">
+  <h3>activeTab</h3>
+  <p class="why"><b>Why:</b> so that clicking the icon, pressing the shortcut or choosing the context menu item lets the extension change the tab you did it on, and no other.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/develop/concepts/activeTab">the activeTab permission</a>): it "gives an extension temporary access to the currently active tab when the user invokes the extension". "Access to the tab lasts while the user is on that page, and is revoked when the user navigates away or closes the tab." The gestures that grant it are "Executing an action", "Executing a context menu item", "Executing a keyboard shortcut from the commands API" and "Accepting a suggestion from the omnibox API". "The extension temporarily gets host permissions for the tab's main frame origin." It "displays no warning message during installation". "Access is not granted to restricted pages, such as chrome:// pages."</p>
+  <p class="cannot"><b>Cannot:</b> touch a tab you did not invoke it on; keep access after you leave the page; reach a cross-origin frame inside the page; reach Chrome's own pages.</p>
+</div>
+
+<div class="perm" id="scripting">
+  <h3>scripting</h3>
+  <p class="why"><b>Why:</b> to put the engine (<code>engine.js</code>) on the page. On demand, through <code>chrome.scripting.executeScript</code> into the tab the <code>activeTab</code> grant covers. Persistently, through <code>chrome.scripting.registerContentScripts</code> for an origin you have granted, and <code>unregisterContentScripts</code> when you remove it.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/scripting">chrome.scripting</a>): "By default, an injection will run in the main frame of the specified tab." Files "are specified as strings that are paths relative to the extension's root directory", so only bundled files can be injected. Registered scripts' <code>persistAcrossSessions</code> "specifies if this content script will persist into future sessions. The default is true." The API needs either host permissions or <code>activeTab</code> for the pages it touches.</p>
+  <p class="cannot"><b>Cannot:</b> by itself reach any page. It runs only where <code>activeTab</code> or a granted origin allows, and only files from the package.</p>
+</div>
+
+<div class="perm" id="storage">
+  <h3>storage</h3>
+  <p class="why"><b>Why:</b> to keep your rules, in <code>chrome.storage.local</code> under one key, <code>rules</code>. The options page reads and writes it; the engine reads it and listens for changes so a disabled rule lets go of the title at once.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/storage">chrome.storage</a>): <code>storage.local</code> has <code>QUOTA_BYTES</code> of 10485760 bytes, about 10 MB. <code>storage.sync</code> is about 100 KB in total and 8 KB per item; this extension does not use it.</p>
+  <p class="cannot"><b>Cannot:</b> see any site's storage, cookies or data. The extension's storage is its own, inside your Chrome profile, and is deleted when the extension is removed.</p>
+</div>
+
+<div class="perm" id="contextmenus">
+  <h3>contextMenus</h3>
+  <p class="why"><b>Why:</b> one item on a page's right-click menu, "Set this tab's title…", as a second way in. Chrome counts "executing a context menu item" among the gestures that grant <code>activeTab</code>, so it reaches the same tab the click was on.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/contextMenus">chrome.contextMenus</a>): the API adds items to Google Chrome's context menu. It carries no access to page content.</p>
+  <p class="cannot"><b>Cannot:</b> read anything about the page. The item knows only that it was clicked, and in which tab.</p>
+</div>
+
+<div class="perm" id="optional">
+  <h3>optional_host_permissions: https://*/* and http://*/*</h3>
+  <p class="why"><b>Why:</b> so that "Always on this site" can ask Chrome for one origin at the moment you tick it. These are declared as <em>optional</em>, which means nothing under them is granted at install.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/permissions">chrome.permissions</a>): "If you want to request hosts that you only discover at runtime, include "https://*/*" in your extension's optional_host_permissions field." "Permissions must be requested from inside a user gesture, like a button's click handler." <code>permissions.remove()</code> "removes access to the specified permissions", and the options page's Remove access button calls it.</p>
+  <p class="cannot"><b>Cannot:</b> be granted without your yes, in Chrome's own prompt, for a specific site. The extension asks for exactly the origin of the page you are on (or the wider pattern you typed, after a confirmation). Every granted origin is listed on the options page with a Remove button.</p>
+</div>
+
+<h2 id="not-asked">What it does not ask for</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Permission</th><th>What it would allow</th><th>Why not here</th></tr></thead>
+  <tbody>
+    <tr><td><code>host_permissions</code>, <code>&lt;all_urls&gt;</code></td><td>Standing access to sites, from install</td><td>The one rule. Access is per site, after you ask, and revocable.</td></tr>
+    <tr><td><code>tabs</code></td><td>The URL and title of every tab, all the time</td><td>Not needed: <code>activeTab</code> gives the URL and title of the tab you invoked it on, while you are there.</td></tr>
+    <tr><td><code>history</code>, <code>cookies</code>, <code>webRequest</code>, <code>debugger</code></td><td>Your history, your cookies, your traffic, a debugger on the page</td><td>None of it has anything to do with a title. The validator rejects a manifest that names them.</td></tr>
+    <tr><td><code>userScripts</code></td><td>Running code the user writes</td><td>A different product. Chrome's documentation says "Users must enable developer mode to execute anything" with it; this extension runs only its own bundled code.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="csp">The Content Security Policy</h2>
+<p>The extension's own pages (the popup and "My rules") run under <code>script-src 'self'; object-src 'self'; connect-src 'none'</code>. The first two mean only scripts from the package can run there. The last, <code>connect-src 'none'</code>, is the no-network rule made into a browser barrier: the pages cannot open a connection to anything, not even to the package itself. Chrome's documentation on <a href="https://developer.chrome.com/docs/extensions/develop/migrate/remote-hosted-code">remotely hosted code</a> defines it as "anything that is executed by the browser that is loaded from someplace other than the extension's own files", and does not allow it in Manifest V3; this extension has none, and the validator checks the code for <code>eval</code>, <code>new Function</code>, remote scripts, <code>fetch</code>, <code>XMLHttpRequest</code> and <code>WebSocket</code> on every build.</p>
+
+<div class="pagenav">
+  <a href="../use/title/index.html">&larr; The title fix</a>
+  <a href="../privacy/index.html">Privacy &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "fix-the-page",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fix the Page: a Chrome extension that fixes the page you are on, only when you ask. Site and extension source.",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "test:unit": "node --test tests/engine.test.mjs",
+    "test:browser": "node --test tests/browser.test.mjs",
+    "test:extension": "node --test tests/extension.test.mjs",
+    "build": "node admin/build/package.mjs",
+    "build:test": "node admin/build/package.mjs --test",
+    "validate": "node admin/build/validate.js",
+    "icons": "node admin/build/icons.mjs",
+    "screenshots": "node admin/build/screenshots.mjs"
+  },
+  "devDependencies": {}
+}

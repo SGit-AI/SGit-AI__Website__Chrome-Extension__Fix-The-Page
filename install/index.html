@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Install · Fix the Page</title>
+<meta name="description" content="Install Fix the Page in under a minute: clone the repository or download the zip, then chrome://extensions, Developer mode, Load unpacked. What Chrome will and will not ask, the keyboard shortcut, and how to update or uninstall.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/install/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/install/index.html">
+<meta property="og:title" content="Install · Fix the Page">
+<meta property="og:description" content="Install Fix the Page in under a minute: clone the repository or download the zip, then chrome://extensions, Developer mode, Load unpacked. What Chrome will and will not ask, the keyboard shortcut, and how to update or uninstall.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl here" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../permissions/index.html">Permissions</a>
+  <a class="nl" href="../privacy/index.html">Privacy</a>
+  <a class="nl" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / install</div>
+<h1>Install</h1>
+<p class="lead">Fix the Page is installed by loading it unpacked, from a clone of its repository or from the release zip. You can read every file before Chrome runs it. Chrome shows no "read and change all your data" warning, because the extension asks for none of that. Under a minute, either way.</p>
+
+<div class="note"><b>Which route?</b> The clone is the one to start with, and the one its author uses: you have the source in front of you, and <code>git pull</code> plus the reload arrow is the whole update. The zip is for a reader who does not use git, and it carries a published SHA-256 so what you unzip is what was released.</div>
+
+<h2 id="clone">Route A: from a clone of the repository</h2>
+<ol class="steps">
+  <li><h3>Clone the repository</h3><p>In a terminal:</p><pre class="shell"><span class="g">$</span> git clone https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page.git
+<span class="g">$</span> cd SGit-AI__Website__Chrome-Extension__Fix-The-Page</pre><p>The extension is the <code>extension/</code> folder. Everything else is this site, the tests and the build tooling.</p></li>
+  <li><h3>Open Chrome's extensions page</h3><p>Type <code>chrome://extensions</code> in the address bar. Chrome's own tutorial puts it this way: "Go to the Extensions page by entering chrome://extensions in a new tab."</p></li>
+  <li><h3>Turn on Developer mode</h3><p>The switch is at the top right of that page. Chrome: "Enable Developer Mode by clicking the toggle switch next to Developer mode."</p></li>
+  <li><h3>Load unpacked, and pick <code>extension/</code></h3><p>Chrome: "Click the Load unpacked button and select the extension directory." Choose the <code>extension</code> folder inside your clone, not the repository root. Fix the Page appears in the list, and its icon in the toolbar (you may need to pin it from the puzzle-piece menu).</p>
+  <figure class="shot"><img src="images/chrome-extensions.png" alt="Chrome's extensions page with Fix the Page loaded unpacked, version 0.1.0" width="1000" height="420"><figcaption>chrome://extensions after Load unpacked. The card shows the version; the options page shows the commit it was built from.</figcaption></figure></li>
+</ol>
+<p><b>To update:</b> <code>git pull</code>, then click the reload arrow on the extension's card. The options page footer shows which version and commit you are running.</p>
+
+<h2 id="zip">Route B: from the release zip</h2>
+<ol class="steps">
+  <li><h3>Download</h3><p><a href="../releases/fix-the-page-v0.1.0.zip">fix-the-page-v0.1.0.zip</a>, with <a href="../releases/fix-the-page-v0.1.0.zip.sha256">its SHA-256</a>. To check it:</p><pre class="shell"><span class="g">$</span> shasum -a 256 fix-the-page-v0.1.0.zip
+<span class="d"># compare with the hash on the <a href="../source/index.html#release" style="color:inherit">source page</a></span></pre></li>
+  <li><h3>Unzip</h3><p>Into a folder you will keep. Chrome loads the extension from that folder every time it starts; if you delete it, the extension stops.</p></li>
+  <li><h3><code>chrome://extensions</code>, Developer mode</h3><p>As in Route A, steps 2 and 3.</p></li>
+  <li><h3>Load unpacked, and pick the unzipped folder</h3><p>The one that holds <code>manifest.json</code>.</p></li>
+</ol>
+<p><b>To update:</b> download the new zip, unzip it over the old folder (or into a new one and load that), then click the reload arrow.</p>
+
+<h2 id="first">Your first fix</h2>
+<p>Open any normal web page and click the Fix the Page icon. The popup shows the page's title and address, with the title ready to edit.</p>
+<figure class="shot"><img src="images/popup.png" alt="The Fix the Page popup: the page's title and address, a Title field, a How selector, a preview line, a Where pattern, an Always on this site tick box, and Apply and Undo buttons" width="360" height="610" style="max-width:360px"><figcaption>The popup, on a page that happens to publish a page API: the extension notices and says so.</figcaption></figure>
+<p>Type a title and press <kbd>Enter</kbd> or Apply. The tab changes at once. That is the whole of the on-demand route: nothing was saved, and the page gets its own title back when you leave or reload. The <a href="../use/title/index.html">title fix page</a> covers the modes, the patterns, and keeping a title on a site.</p>
+
+<h2 id="asks">What Chrome will and will not ask</h2>
+<ul>
+  <li><b>At install:</b> nothing about your data. The only standing permission that touches pages is <code>activeTab</code>, and Chrome's documentation says it "displays no warning message during installation".</li>
+  <li><b>When you tick "Always on this site":</b> Chrome's own prompt, for that one site. The extension lists <code>https://*/*</code> and <code>http://*/*</code> as <em>optional</em> host permissions, which Chrome's documentation describes as the way "to request hosts that you only discover at runtime"; nothing under them is granted until you say yes, site by site.</li>
+  <li><b>On Chrome's own pages:</b> the popup says "Chrome does not allow extensions on this page". Chrome's documentation: "Access is not granted to restricted pages, such as chrome:// pages."</li>
+</ul>
+
+<h2 id="shortcut">The keyboard shortcut</h2>
+<p>The suggested shortcut is <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>, which opens the popup for the current tab. If another extension already has it, Chrome leaves it unset; you can set one at <code>chrome://extensions/shortcuts</code>. The options page shows the shortcut that is in force.</p>
+
+<h2 id="uninstall">Uninstall</h2>
+<p>Remove it from <code>chrome://extensions</code>. Chrome deletes the extension's storage with it, so your rules go too: export them first from "My rules" if you want to keep them.</p>
+
+<div class="pagenav">
+  <a href="../index.html">&larr; Home</a>
+  <a href="../use/title/index.html">The title fix &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>

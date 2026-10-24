@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Release history · Fix the Page</title>
+<meta name="description" content="Release history for fix-the-page.chrome-extensions.sgit.ai. Every push to dev is a release, validated, tested and auto-tagged by CI; the site and the extension carry one version.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/admin/versions.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/admin/versions.html">
+<meta property="og:title" content="Release history · Fix the Page">
+<meta property="og:description" content="Release history for fix-the-page.chrome-extensions.sgit.ai. Every push to dev is a release, validated, tested and auto-tagged by CI; the site and the extension carry one version.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../permissions/index.html">Permissions</a>
+  <a class="nl" href="../privacy/index.html">Privacy</a>
+  <a class="nl" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / admin / versions</div>
+<h1>Release history</h1>
+<p class="lead">Every push to <code>dev</code> is a release: CI validates the site and the extension, runs the tests, verifies the version bump, tags the commit <code>vX.Y.Z</code>, and deploys to GitHub Pages. The version is owned by <code>admin/build/version.txt</code>, must agree with the release commit's subject, and is the extension's version too, without the <code>v</code>. So "which build am I running?" always has one answer.</p>
+<div class="tablewrap"><table class="vers">
+  <thead><tr><th>Version</th><th>Date</th><th>What shipped</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="vnum">v0.1.0</td>
+      <td>24 October 2026</td>
+      <td>First MVP, built from the briefing pack. <b>The extension:</b> Manifest V3 with <code>activeTab</code>, <code>scripting</code>, <code>storage</code> and <code>contextMenus</code>, optional host permissions for http and https, a CSP with <code>connect-src 'none'</code>; the title fix with <code>set</code>, <code>prefix</code>, <code>suffix</code> and <code>template</code> modes; on-demand apply through <code>activeTab</code>; persistent per-site rules through <code>optional_host_permissions</code> and <code>registerContentScripts</code>; an engine that holds the title against rewrites and route changes, undoes, and is idempotent; the popup with preview, pattern, "Always on this site", Undo and the restricted-page message; "My rules" with edit, enable, delete, export, import, site access removal and the build stamp; the keyboard shortcut and the context menu item; detection of a site's page API. <b>The release:</b> <code>releases/fix-the-page-v0.1.0.zip</code> and its SHA-256, built deterministically by <code>package.mjs</code>. <b>The tests:</b> 97 unit tests of the engine's core, 11 engine-in-a-page tests and 12 extension-in-Chromium tests with Playwright, 31 validator tests, and a runner that fails if a test file is not run. <b>The site:</b> this page, the front page, install (from a clone or from the zip, with screenshots), the title fix, permissions with Chrome's documentation quoted, privacy, source and releases, markdown twins, <code>llms.txt</code>, and the validate → test → tag → deploy pipeline copied from the hub with a test job added.</td>
+    </tr>
+  </tbody>
+</table></div>
+<div class="pagenav">
+  <a href="../source/index.html">&larr; Source and releases</a>
+  <a href="index.html">How this site is built &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>

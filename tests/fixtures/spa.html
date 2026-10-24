@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>SPA home</title></head>
+<body><h1>A single-page app</h1>
+<p><a href="/a/1" data-route>Go to /a/1</a> · <a href="/b/1" data-route>Go to /b/1</a></p>
+<script>
+  function titleFor(path) { return 'SPA ' + path; }
+  function go(path) { history.pushState({}, '', path); document.title = titleFor(path); }
+  window.go = go;
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-route]');
+    if (!a) return;
+    e.preventDefault();
+    go(a.getAttribute('href'));
+  });
+  window.addEventListener('popstate', function () { document.title = titleFor(location.pathname); });
+</script>
+</body></html>

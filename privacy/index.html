@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy · Fix the Page</title>
+<meta name="description" content="Fix the Page makes no network calls, sends no telemetry and has no account. What it stores (your rules, in your browser), what it reads from a page (the URL and the title), and how each goes away.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/privacy/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/privacy/index.html">
+<meta property="og:title" content="Privacy · Fix the Page">
+<meta property="og:description" content="Fix the Page makes no network calls, sends no telemetry and has no account. What it stores (your rules, in your browser), what it reads from a page (the URL and the title), and how each goes away.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../permissions/index.html">Permissions</a>
+  <a class="nl here" href="../privacy/index.html">Privacy</a>
+  <a class="nl" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / privacy</div>
+<h1>Privacy</h1>
+<p class="lead">The short version: nothing leaves your browser. The extension makes no network calls, sends no telemetry, has no account, and reads from a page only the two things a title fix needs. Here is the long version, with where to check each claim.</p>
+
+<h2 id="network">No network calls</h2>
+<ul>
+  <li>The extension's pages run under a Content Security Policy with <code>connect-src 'none'</code>, which the browser enforces: they cannot open a connection to anything.</li>
+  <li>The code contains no <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>sendBeacon</code> or <code>EventSource</code>. The <a href="../source/index.html#validator">validator</a> checks for each of them on every build and refuses a release that has one. The <a href="../source/index.html#tests">test suite</a> checks that the validator catches them.</li>
+  <li>No script or stylesheet is loaded from the web. Every file the extension runs is in the package you installed, and you can read it.</li>
+</ul>
+
+<h2 id="telemetry">No telemetry, no analytics, no account</h2>
+<p>The extension does not count, report or phone home about anything. It cannot: see above. This website is static, served from GitHub Pages, with no analytics script.</p>
+
+<h2 id="stored">What is stored, and where</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>What</th><th>Where</th><th>Who can see it</th><th>How it goes away</th></tr></thead>
+  <tbody>
+    <tr><td>Your rules: for each, an id, a match pattern, the fix name, your text, the mode, a creation time and whether it is enabled</td><td><code>chrome.storage.local</code>, inside your Chrome profile on your machine</td><td>You, on the "My rules" page and in an export file you choose to write</td><td>Delete a rule on "My rules", or remove the extension, which deletes its storage</td></tr>
+    <tr><td>Which sites have access</td><td>Chrome's own record of the extension's granted permissions</td><td>You, on "My rules" and on Chrome's extension details page</td><td>Remove access on "My rules", or on Chrome's details page</td></tr>
+    <tr><td>Registered content scripts, one per granted site</td><td>Chrome's record for the extension</td><td>Shown on "My rules" as the site's access</td><td>Removed with the site's access</td></tr>
+    <tr><td>Build stamp (version, commit, time)</td><td>A file in the package</td><td>Shown on "My rules"</td><td>With the package</td></tr>
+  </tbody>
+</table></div>
+<p>Nothing is stored about the pages you visit. A rule names a pattern you chose, not a history.</p>
+
+<h2 id="reads">What it reads from a page</h2>
+<p>Two things: the page's URL, to decide whether a rule matches, and the page's title, to replace it or build on it. It never reads form fields, cookies, page text or anything else, and never stores what it reads. The engine runs in Chrome's isolated world for content scripts, so the page's own scripts cannot see the extension and the extension does not share the page's JavaScript objects. The one exception is a tiny bridge, run in the page's world only when you open the popup there, which looks for a site's published page API at <code>window.__tools.page</code> and records its name, version and the names of its fixes, nothing more, on an attribute the engine reads.</p>
+
+<h2 id="files">Export and import</h2>
+<p>Export writes your rules to a JSON file through your browser's download, to a place you choose. Import reads a file you pick. Neither touches the network. An import file is validated against the documented shape and refused whole if it does not match; nothing in it is executed under any circumstances.</p>
+
+<h2 id="site">This website</h2>
+<p>Static pages on GitHub Pages, no cookies set by us, no analytics, no forms. GitHub serves the pages and keeps its own server logs under <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">its privacy statement</a>.</p>
+
+<h2 id="contact">Questions</h2>
+<p>The source is public at <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>. If you find anything here that does not match the code, that is a bug in one or the other, and the repository's issues are the place for it.</p>
+
+<div class="pagenav">
+  <a href="../permissions/index.html">&larr; Permissions</a>
+  <a href="../source/index.html">Source and releases &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>

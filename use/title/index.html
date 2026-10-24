@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The title fix · Fix the Page</title>
+<meta name="description" content="How the title fix works: set, prefix, suffix and template modes; on this page now or always on one site; match patterns; undo; the My rules page with export and import; what it cannot touch.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/use/title/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/use/title/index.html">
+<meta property="og:title" content="The title fix · Fix the Page">
+<meta property="og:description" content="How the title fix works: set, prefix, suffix and template modes; on this page now or always on one site; match patterns; undo; the My rules page with export and import; what it cannot touch.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../../install/index.html">Install</a>
+  <a class="nl here" href="../../use/title/index.html">The title fix</a>
+  <a class="nl" href="../../permissions/index.html">Permissions</a>
+  <a class="nl" href="../../privacy/index.html">Privacy</a>
+  <a class="nl" href="../../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / use / the title fix</div>
+<h1>The title fix</h1>
+<p class="lead">Make a tab's title say what you want. In one of four ways, on this page now or on every page of a site, with a visible list of what you did and one click to undo it. This is the only fix in version 0.1. <span class="status status-built">built</span></p>
+
+<h2 id="modes">Four ways to change a title</h2>
+<p>Pick one in the popup's "How" selector. The preview line under it shows what the tab will say before you apply anything.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Mode</th><th>What it does</th><th>You type</th><th>On a page titled "Inbox (3)"</th></tr></thead>
+  <tbody>
+    <tr><td><code>set</code></td><td>Replace the title</td><td><code>Work mail</code></td><td>Work mail</td></tr>
+    <tr><td><code>prefix</code></td><td>Add your text before the page's own title</td><td><code>[A] </code></td><td>[A] Inbox (3)</td></tr>
+    <tr><td><code>suffix</code></td><td>Add your text after it</td><td><code> · work</code></td><td>Inbox (3) · work</td></tr>
+    <tr><td><code>template</code></td><td>Your text with <code>{title}</code>, <code>{host}</code> and <code>{path}</code> filled in</td><td><code>[PROD] {title}</code></td><td>[PROD] Inbox (3)</td></tr>
+  </tbody>
+</table></div>
+<p><code>template</code> is the general form; the other three are shortcuts. In every mode but <code>set</code>, the fix follows the page: when the page changes its own title to "Inbox (4)", the tab says "[A] Inbox (4)".</p>
+
+<h2 id="now">On this page, now</h2>
+<p>Click the icon (or press <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd>, or choose "Set this tab's title…" from the page's right-click menu). Type, pick a mode, Apply. The change is immediate and stays while you are on the page, even on a single-page app that rewrites its title on every route change: the engine watches the <code>&lt;title&gt;</code> element and puts your title back each time, without looping. Leave the page or reload it and the page has its own title again. Nothing was saved.</p>
+<p>This route uses <code>activeTab</code>, so it reaches the tab's main page only: Chrome's documentation says the extension "temporarily gets host permissions for the tab's main frame origin". A title inside a cross-origin frame is out of reach, which is correct, since the tab shows the main page's title anyway.</p>
+
+<h2 id="always">On every page of a site</h2>
+<p>Tick <b>Always on this site</b> before you press Apply. Then:</p>
+<ol>
+  <li>Chrome shows its own prompt, asking you to allow this one site. (Chrome's documentation: "Permissions must be requested from inside a user gesture, like a button's click handler." The Apply click is that gesture.)</li>
+  <li>If you agree, the rule is saved, and the engine is registered to run on that site's pages at load. It applies your rules there on every visit, with no further clicks, and across browser restarts.</li>
+  <li>If you refuse, nothing is saved and nothing changes.</li>
+</ol>
+<p>The rule is saved whether or not the page is open later; the site's access is what makes it run. Remove the access and the rule stays listed but does nothing until you grant access again.</p>
+
+<h2 id="where">Where a rule applies</h2>
+<p>The "Where" field holds a <a href="https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns">Chrome match pattern</a>: <code>scheme://host/path</code>, where <code>*</code> stands for anything. The default is the whole site you are on, such as <code>https://app.example.com/*</code>. Narrow it to a part of a site with the path, or widen it with the host:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Pattern</th><th>Matches</th></tr></thead>
+  <tbody>
+    <tr><td><code>https://app.example.com/*</code></td><td>Every page on that host, over https</td></tr>
+    <tr><td><code>https://app.example.com/dashboard/*</code></td><td>Only pages under /dashboard/</td></tr>
+    <tr><td><code>https://app.example.com/*?tab=ops*</code></td><td>Pages whose query string starts with tab=ops (the path is matched together with the query)</td></tr>
+    <tr><td><code>https://*.example.com/*</code></td><td>Every subdomain of example.com. Wider than one site, so the popup asks you to confirm, and Chrome asks for all of them</td></tr>
+    <tr><td><code>*://example.com/*</code></td><td>http and https. Also wider than one origin</td></tr>
+  </tbody>
+</table></div>
+<p>The pattern must match the page you are on, or the popup refuses it: a rule you cannot see working is a rule you cannot check. Patterns are matched against many URLs in the test suite, not one, which is the hub's fourth silent failure ("a pattern written against one example") kept at bay.</p>
+
+<h2 id="undo">Undo</h2>
+<p><b>Undo on this page</b>, in the popup, gives the page its own title back and stops watching it. On the options page, disabling or deleting a rule does the same on every open page that had it. The engine keeps the page's latest own title, not a stale copy from when you first clicked, so what comes back is what the page would show now.</p>
+
+<h2 id="rules">My rules</h2>
+<figure class="shot"><img src="../../install/images/options.png" alt="The My rules page: rules grouped by site with Enabled, Edit and Delete; the sites with access, each with Remove access; and the build's version, commit and time" width="900" height="1100" style="max-width:720px"><figcaption>"My rules", the options page. Everything the extension holds, with a button to take each thing away.</figcaption></figure>
+<ul>
+  <li><b>Rules,</b> grouped by site. Edit the title, the mode or the pattern. Enable or disable with the tick box. Delete, with a confirmation.</li>
+  <li><b>Sites with access.</b> Every origin you have allowed, from Chrome's own record of the extension's permissions. <b>Remove access</b> gives the permission back to Chrome and unregisters the engine for that site at once; it then offers to delete the site's rules too.</li>
+  <li><b>Export</b> writes every rule to a JSON file you save where you like. <b>Import</b> reads such a file back, replacing rules with the same id and adding the rest. A file that is not exactly the documented shape is refused whole, with a message saying which rule and which field, and nothing in it is ever executed.</li>
+  <li><b>About this build:</b> version, commit and build time, and the keyboard shortcut in force.</li>
+</ul>
+<h3 id="format">The export format</h3>
+<pre class="shell">{
+  "format": "fix-the-page/rules",
+  "version": 1,
+  "exported": "2026-10-24T20:40:00Z",
+  "rules": [
+    {
+      "id": "r-2026-10-24-001",
+      "match": "https://app.example.com/dashboard/*",
+      "fix": "title",
+      "value": "Ops dashboard",
+      "mode": "set",
+      "created": "2026-10-24T20:40:00Z",
+      "enabled": true
+    }
+  ]
+}</pre>
+<p>A rule has exactly those seven fields. <code>fix</code> is the name of a bundled fix (only <code>title</code> in v0.1), <code>mode</code> one of the four above, <code>value</code> at most 500 characters. Anything else, including any field that looks like code, makes the file invalid. Rules are stored in <code>chrome.storage.local</code>, whose quota Chrome documents as 10 MB; a rule is about 200 bytes.</p>
+
+<h2 id="restricted">Pages it cannot touch</h2>
+<p>Chrome's own pages (<code>chrome://</code>), the Chrome Web Store, and pages that are not http or https. The popup says so, in words, rather than failing silently. Chrome's documentation: "Access is not granted to restricted pages, such as chrome:// pages", and in its own example a tab with no URL "is a restricted page".</p>
+
+<h2 id="site-api">Sites that publish a page API</h2>
+<p>The newsroom's pages publish a small JavaScript API at <code>window.__tools.page</code>, with <code>list()</code>, <code>apply()</code>, <code>toggle()</code> and <code>reset()</code> (see <a href="https://newsroom.sgit.ai/assets/page-fixes/v0/v0.1/v0.1.0/api.json">its api.json</a>). The article's thesis is that sites should publish primitives and fixes should prefer them. In v0.1 the extension <b>detects</b> such an API and says so in the popup; it does not yet call it. Calling a site's own fixes by name is the first item on the <a href="../../index.html#next">roadmap</a>. <span class="status status-spec">specified</span></p>
+
+<h2 id="limits">What this release does not do</h2>
+<ul>
+  <li>Any fix other than the title.</li>
+  <li>Sync rules between machines. Rules are in <code>chrome.storage.local</code>, not <code>sync</code>; Chrome documents sync's quota as about 100 KB in total and 8 KB per item, and whether to use it is a later decision.</li>
+  <li>Change a title inside a cross-origin frame.</li>
+  <li>Sign rules, or share rule packs.</li>
+  <li>Run in Firefox or Safari, or come from the Chrome Web Store.</li>
+</ul>
+
+<div class="pagenav">
+  <a href="../../install/index.html">&larr; Install</a>
+  <a href="../../permissions/index.html">Permissions &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../../install/index.html">Install</a>
+    <a href="../../use/title/index.html">The title fix</a>
+    <a href="../../permissions/index.html">Permissions</a>
+    <a href="../../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../../source/index.html">Source and releases</a>
+    <a href="../../admin/versions.html">Release history</a>
+    <a href="../../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../../assets/version.js"></script>
+</body>
+</html>

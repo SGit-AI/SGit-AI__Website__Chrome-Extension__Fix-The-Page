@@ -218,3 +218,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Fix the Page (this repo is a static site plus an extension, not a Python package) ---
+# The Python template above ignores build/ and lib/; the site's build tooling lives in admin/build/.
+!admin/build/
+node_modules/
+tests/.build/
+tests/.profiles/
+tests/.out/

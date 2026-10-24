@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fix the Page</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header>
+  <h1>Fix the Page</h1>
+  <a id="rules-link" href="options.html" target="_blank" rel="noopener">My rules</a>
+</header>
+
+<section id="restricted" class="panel" hidden>
+  <p><b>Chrome does not allow extensions on this page.</b></p>
+  <p id="restricted-why" class="dim">Its own pages, the Web Store and a few others cannot be changed by any extension.</p>
+</section>
+
+<section id="error" class="panel" hidden>
+  <p><b>Fix the Page could not reach this page.</b></p>
+  <p id="error-text" class="dim"></p>
+</section>
+
+<section id="main" hidden>
+  <div class="page">
+    <div class="dim small">This page</div>
+    <div id="page-title" class="ptitle"></div>
+    <div id="page-url" class="purl"></div>
+    <div id="site-api" class="api" hidden></div>
+    <div id="applied" class="applied" hidden>A title fix is applied here.</div>
+  </div>
+
+  <form id="form">
+    <label for="value">Title</label>
+    <input id="value" name="value" type="text" maxlength="500" autocomplete="off" spellcheck="false">
+
+    <label for="mode">How</label>
+    <select id="mode" name="mode">
+      <option value="set">Set: replace the title</option>
+      <option value="prefix">Prefix: add before the page's title</option>
+      <option value="suffix">Suffix: add after the page's title</option>
+      <option value="template">Template: {title}, {host}, {path}</option>
+    </select>
+
+    <div id="preview-row"><span class="dim small">The tab will say</span> <output id="preview" for="value mode"></output></div>
+
+    <label for="match">Where</label>
+    <input id="match" name="match" type="text" maxlength="1000" autocomplete="off" spellcheck="false">
+    <p class="hint">A Chrome match pattern. The default is this whole site. <code>*</code> stands for anything.</p>
+
+    <label class="check"><input id="always" type="checkbox"> Always on this site</label>
+    <p class="hint">Chrome will ask you to allow this one site. The title is then fixed on every visit, with no click.</p>
+
+    <div class="buttons">
+      <button id="apply" type="submit" class="primary">Apply</button>
+      <button id="undo" type="button">Undo on this page</button>
+    </div>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<footer><span id="version"></span> · <a href="https://fix-the-page.chrome-extensions.sgit.ai/" target="_blank" rel="noopener">how it works</a></footer>
+
+<script src="engine.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

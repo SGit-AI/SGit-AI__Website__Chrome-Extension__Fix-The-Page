@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Original</title></head>
+<body><h1>A page that rewrites its title every 500 ms</h1>
+<script>
+  var n = 0;
+  window.__rewrites = 0;
+  setInterval(function () { n++; document.title = 'Rewritten ' + n; window.__rewrites++; }, 500);
+</script>
+</body></html>

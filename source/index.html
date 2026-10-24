@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Source and releases · Fix the Page</title>
+<meta name="description" content="The source of Fix the Page, file by file; the current release zip and its SHA-256; what the validator refuses; the three layers of tests; how to build it yourself; licence and credits.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/source/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/source/index.html">
+<meta property="og:title" content="Source and releases · Fix the Page">
+<meta property="og:description" content="The source of Fix the Page, file by file; the current release zip and its SHA-256; what the validator refuses; the three layers of tests; how to build it yourself; licence and credits.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.1 · the title fix</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <a class="nl" href="../install/index.html">Install</a>
+  <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../permissions/index.html">Permissions</a>
+  <a class="nl" href="../privacy/index.html">Privacy</a>
+  <a class="nl here" href="../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / source</div>
+<h1>Source and releases</h1>
+<p class="lead">The article this extension comes from says such an extension "could be shipped from a GitHub repository or an encrypted vault and loaded locally, so the reader can see exactly what they are installing". So: the whole extension is a dozen small files with no dependencies, readable in one sitting, and every release is a zip of exactly those files with its hash published here.</p>
+
+<h2 id="release">The current release</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Version</th><th>File</th><th>SHA-256</th></tr></thead>
+  <tbody>
+    <tr><td class="vnum" style="font-family:var(--mono);font-weight:700;color:var(--accent-dk)">v0.1.0</td><td><a href="../releases/fix-the-page-v0.1.0.zip">fix-the-page-v0.1.0.zip</a> · <a href="../releases/fix-the-page-v0.1.0.zip.sha256">.sha256</a></td><td><div class="hashbox"><code class="sha256">c53f64dc12def64e00a66c4d055de39e1c706914823592237e8f32ff99303419</code></div></td></tr>
+  </tbody>
+</table></div>
+<p>To check a download: <code>shasum -a 256 fix-the-page-v0.1.0.zip</code> (macOS, Linux) or <code>certutil -hashfile fix-the-page-v0.1.0.zip SHA256</code> (Windows) and compare with the hash above. The zip is built by <code>admin/build/package.mjs</code> from <code>extension/</code>, and the validator refuses a release whose zip differs from <code>extension/</code> in any byte, or whose hash file does not match. The site's version, the extension's version and the zip's name are one number: <a href="../admin/versions.html">the release history</a> has them all.</p>
+
+<h2 id="files">The extension, file by file</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>File</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>manifest.json</code></td><td>Manifest V3. The four permissions, the optional host permissions, the CSP, the popup, the options page, the shortcut. <a href="../permissions/index.html">Explained here.</a></td></tr>
+    <tr><td><code>engine.js</code></td><td>The one script that touches a page. Half of it is pure functions with no DOM: parse a match pattern, match a URL, compute a title from a rule, validate a rule, validate an import file. Node tests them without a browser. The other half applies rules to <code>document.title</code>, watches the <code>&lt;title&gt;</code> element and the URL, and undoes. Injected both on demand and as a registered content script; idempotent either way.</td></tr>
+    <tr><td><code>bridge.js</code></td><td>Runs in the page's own world for one purpose: to notice a site that publishes <code>window.__tools.page</code> and leave its name and version on an attribute the engine can read. Twenty lines.</td></tr>
+    <tr><td><code>service-worker.js</code></td><td>Keeps the registered content scripts in step with the origins you have granted, answers the popup and the options page, and adds the context menu item. Makes no network calls, never reads a page.</td></tr>
+    <tr><td><code>popup.html</code>, <code>popup.js</code>, <code>popup.css</code></td><td>The toolbar popup: the page's title and URL, the title field, the mode, the pattern, Apply, Always on this site, Undo. Says when Chrome does not allow it on a page.</td></tr>
+    <tr><td><code>options.html</code>, <code>options.js</code>, <code>options.css</code></td><td>"My rules": rules by site, sites with access, export, import, the build stamp.</td></tr>
+    <tr><td><code>build.json</code>, <code>build.js</code></td><td>The build stamp: version, git commit, build time. Written by <code>package.mjs</code>; shown in the options page footer.</td></tr>
+    <tr><td><code>icons/</code></td><td>Three PNGs, drawn by <code>admin/build/icons.mjs</code>, no image editor involved.</td></tr>
+  </tbody>
+</table></div>
+<p>No framework, no build step for the extension itself: what is in <code>extension/</code> is what runs. <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page/tree/dev/extension">Browse it on GitHub</a>.</p>
+
+<h2 id="repo">The repository</h2>
+<pre class="shell"><span class="cy">extension/</span>        the extension (what goes in the zip)
+<span class="cy">releases/</span>         fix-the-page-vX.Y.Z.zip and .sha256, one per release
+<span class="cy">tests/</span>            engine unit tests (Node), engine-in-a-page and extension-in-Chromium tests (Playwright), fixtures
+<span class="cy">admin/build/</span>      version.txt · validate.js (the gate) · package.mjs (the zip) · icons.mjs · screenshots.mjs · zip.js
+<span class="cy">admin/</span>            versions.html (release history) · debriefs/ (one per working session) · index.html (how this site is built)
+<span class="cy">install/ use/ permissions/ privacy/ source/</span>   this site, each page with a .md twin
+<span class="cy">.github/workflows/deploy-pages.yml</span>   validate → test → tag → deploy, on every push to dev</pre>
+
+<h2 id="validator">The validator: what a release must pass</h2>
+<p><code>node admin/build/validate.js</code> runs before every push and in CI, and a failure means no tag and no publish. It started as the hub's validator and adds the extension's own gates:</p>
+<ul>
+  <li>Version agreement: <code>admin/build/version.txt</code>, <code>assets/version.js</code>, every page's badge, <code>llms.txt</code>, <code>index.md</code>, the versions table, <code>extension/manifest.json</code>, <code>extension/build.json</code> and <code>package.json</code> all carry the same version.</li>
+  <li>Every internal link resolves; every canonical URL is on this host and names its own page.</li>
+  <li>No file in the tree looks like a key, a token or a private key.</li>
+  <li><b>The manifest:</b> no <code>host_permissions</code>; no <code>tabs</code>, <code>history</code>, <code>cookies</code>, <code>webRequest</code>, <code>debugger</code> or <code>&lt;all_urls&gt;</code>; only the four permissions; optional host permissions for http and https only; no static content scripts; a CSP with no remote or unsafe source and <code>connect-src 'none'</code>.</li>
+  <li><b>The code:</b> no <code>eval</code>, <code>new Function</code>, <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>importScripts</code>, <code>sendBeacon</code>, string timers, <code>innerHTML</code> assignment, inline scripts or handlers, or any URL of a remote script or stylesheet.</li>
+  <li><b>The release:</b> the zip and its <code>.sha256</code> exist for this version, the hash matches, the zip's files equal <code>extension/</code> byte for byte, the zip's manifest is not a test build, and this page publishes the current hash.</li>
+  <li>Every page links to the current release.</li>
+</ul>
+
+<h2 id="tests">The tests</h2>
+<p><code>npm test</code> runs <code>tests/run.mjs</code>, which builds a test variant of the extension, runs every test file, and fails if a test file was not run or ran zero tests (the hub's fifth silent failure, "a test file nothing imports"). Three layers, after the brief's acceptance table:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Layer</th><th>How</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td>Engine unit tests</td><td>Node, no browser, the pure core</td><td>The match pattern grammar against many URLs and many patterns; the four modes; rule and import validation, including files with unknown fixes, bad patterns and code-like fields; export then import gives identical rules</td></tr>
+    <tr><td>Engine in a page</td><td>Playwright, fixture pages, <code>engine.js</code> added to the page, no extension</td><td>A static page; a page that rewrites its title every 500 ms (the observer does not loop); a single-page app with <code>pushState</code>; template following the page's later titles; undo; injecting the engine twice; a replaced <code>&lt;title&gt;</code> element; site API detection</td></tr>
+    <tr><td>Extension in Chromium</td><td>Playwright, the test build loaded unpacked</td><td>A persistent rule applies at load with no click; removing a site's access unregisters the engine; the popup on a normal page and on a <code>chrome://</code> page; "Always on this site"; the options page's edit, enable, delete, export, import and remove access</td></tr>
+    <tr><td>The validator</td><td>Node</td><td>The shipped manifest and code pass; manifests and code written to fail are caught</td></tr>
+  </tbody>
+</table></div>
+<p>Three checks are manual, because Chrome's toolbar icon and its permission prompt are browser UI that automation cannot press: a real install from the site, Chrome asking for one site only, and the popup on a Chrome page. They are done before each release that touches the popup, the permissions or the engine, and recorded in the <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page/tree/dev/admin/debriefs">debriefs</a>.</p>
+<p>The test build lists <code>http://127.0.0.1/*</code> in <code>host_permissions</code>, standing in for the per-site grant a test cannot click. It is never shipped: the validator refuses a release zip that carries it.</p>
+
+<h2 id="build">Building it yourself</h2>
+<pre class="shell"><span class="g">$</span> git clone https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page.git
+<span class="g">$</span> cd SGit-AI__Website__Chrome-Extension__Fix-The-Page
+<span class="g">$</span> npm test                          <span class="d"># needs Node 22 and Playwright with Chromium</span>
+<span class="g">$</span> node admin/build/package.mjs      <span class="d"># releases/fix-the-page-v0.1.0.zip and its .sha256</span>
+<span class="g">$</span> node admin/build/validate.js</pre>
+<p>The zip writer is deterministic: the same tree gives the same bytes, apart from the build stamp.</p>
+
+<h2 id="licence">Licence and credits</h2>
+<p>Code is Apache 2.0; site content is CC BY 4.0, as the <a href="https://chrome-extensions.sgit.ai">hub</a> and the <a href="https://newsroom.sgit.ai">newsroom</a>. The validator and the stylesheet started from the hub's (Apache 2.0). The idea, the one rule and the first fix are from the newsroom's <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">Fix the page yourself</a> by Dinis Cruz. Facts about Chrome are quoted from <a href="https://developer.chrome.com/docs/extensions">Chrome's extension documentation</a>.</p>
+
+<div class="pagenav">
+  <a href="../privacy/index.html">&larr; Privacy</a>
+  <a href="../admin/versions.html">Release history &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../install/index.html">Install</a>
+    <a href="../use/title/index.html">The title fix</a>
+    <a href="../permissions/index.html">Permissions</a>
+    <a href="../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../source/index.html">Source and releases</a>
+    <a href="../admin/versions.html">Release history</a>
+    <a href="../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../assets/version.js"></script>
+</body>
+</html>
