@@ -67,6 +67,17 @@ function checkManifest(manifest, { release = true } = {}) {
     if (!/connect-src 'none'/.test(csp)) errors.push('CSP must set connect-src \'none\' (ABP rule 3)');
   }
   if (manifest.background && manifest.background.scripts) errors.push('MV3 background must be a service worker');
+  const sandboxPages = (manifest.sandbox && manifest.sandbox.pages) || [];
+  if (sandboxPages.length) {
+    const scsp = manifest.content_security_policy && manifest.content_security_policy.sandbox;
+    if (!scsp) errors.push('a sandbox page needs content_security_policy.sandbox');
+    else {
+      if (!/connect-src 'none'/.test(scsp)) errors.push("the sandbox CSP must set connect-src 'none' (ABP rule 3)");
+      if (/https?:|\*/.test(scsp.replace(/'self'/g, ''))) errors.push(`the sandbox CSP allows a remote source: ${scsp}`);
+      if (!/^sandbox allow-scripts;/.test(scsp) || /allow-same-origin|allow-top-navigation|allow-forms|allow-popups/.test(scsp)) errors.push('the sandbox CSP must start with "sandbox allow-scripts;" and allow nothing else');
+    }
+    for (const p of sandboxPages) if (!/^[a-z0-9_-]+\.html$/.test(p)) errors.push(`sandbox page "${p}" is not a local html file`);
+  }
   return errors;
 }
 
@@ -94,15 +105,46 @@ const HTML_BANS = [
   [/<iframe\b/i, 'an <iframe>'],
 ];
 
+// The one exception, by name: the sandbox turns the user's own text into a function. It runs in an opaque
+// origin with no network, and every message it sends is checked against the policy on the other side.
+const CODE_BAN_EXCEPTIONS = { 'sandbox.js': ['new Function', 'Function("...")'] };
+
+// The code bans are about code, not about words: a list of names a lint refuses may name fetch without
+// calling it. So comments and string literals are blanked before the bans run. The remote-URL check below
+// runs on the raw text, because a URL is a string by nature.
+function stripStringsAndComments(t) {
+  return t.replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1')
+    .replace(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g, '""');
+}
+
 function checkExtensionCode(dir) {
   const errors = [];
+  let sandboxPages = [];
+  try { sandboxPages = (JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8')).sandbox || {}).pages || []; } catch (e) { /* no manifest */ }
   for (const f of walk(dir)) {
     const r = path.relative(dir, f);
     if (/\.(png|json)$/.test(r)) continue;
     const t = fs.readFileSync(f, 'utf8');
-    if (/\.js$/.test(r)) for (const [re, what] of CODE_BANS) if (re.test(t)) errors.push(`${r}: contains ${what} (ABP rules 2 and 3)`);
+    if (/\.js$/.test(r)) {
+      const code = stripStringsAndComments(t);
+      for (const [re, what] of CODE_BANS) {
+        if ((CODE_BAN_EXCEPTIONS[r] || []).includes(what)) continue;
+        if (re.test(code)) errors.push(`${r}: contains ${what} (ABP rules 2 and 3)`);
+      }
+    }
     if (/\.html$/.test(r)) {
-      for (const [re, what] of HTML_BANS) if (re.test(t)) errors.push(`${r}: contains ${what}`);
+      for (const [re, what] of HTML_BANS) {
+        if (what === 'an <iframe>') {
+          for (const m of t.matchAll(/<iframe\b[^>]*>/gi)) {
+            const src = (/\bsrc="([^"]*)"/.exec(m[0]) || [])[1];
+            if (!src || !sandboxPages.includes(src)) errors.push(`${r}: contains an <iframe> that is not a declared sandbox page (${src || 'no src'})`);
+            if (!/\bsandbox=/.test(m[0])) errors.push(`${r}: the sandbox <iframe> lacks a sandbox attribute`);
+          }
+          continue;
+        }
+        if (re.test(t)) errors.push(`${r}: contains ${what}`);
+      }
       for (const m of t.matchAll(/<script[^>]+src="([^"]+)"/g)) if (!fs.existsSync(path.join(dir, m[1]))) errors.push(`${r}: script ${m[1]} is not in the package`);
     }
     if (/\.(js|html|css)$/.test(r) && /\b(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}\/[^\s"'<>)]*\.(js|css|wasm)\b/i.test(t)) errors.push(`${r}: references a remote script or stylesheet URL`);

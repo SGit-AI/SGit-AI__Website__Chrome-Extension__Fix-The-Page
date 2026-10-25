@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Playground · Fix the Page</title>
+<link rel="stylesheet" href="playground.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Fix the Page: playground</h1>
+    <p class="dim">Write a small fix as a script, declare what it may do, run it on a page, see exactly what it did, undo it, keep it. The script runs in a sandbox with nothing in it but the capabilities you tick; every call is checked against the policy before it reaches the page.</p>
+  </div>
+  <nav class="links"><a href="options.html">My rules</a> · <a href="https://fix-the-page.chrome-extensions.sgit.ai/use/playground/" target="_blank" rel="noopener">how it works</a></nav>
+</header>
+
+<section id="restricted" class="panel warn" hidden>
+  <p><b>No page to work on.</b> <span id="restricted-why"></span></p>
+  <p class="dim">Open the playground from the Fix the Page popup on a normal web page, and it works on that tab. You can still write, save, export and import experiments here.</p>
+</section>
+
+<main class="grid">
+  <section class="col editor">
+    <div class="page" id="page" hidden>
+      <div class="dim small">Working on this tab</div>
+      <div id="page-title" class="ptitle"></div>
+      <div id="page-url" class="purl"></div>
+    </div>
+
+    <label for="name">Name</label>
+    <input id="name" type="text" maxlength="120" placeholder="e.g. Hide the cookie banner on example.com">
+
+    <label for="match">Where it applies</label>
+    <input id="match" type="text" maxlength="1000" class="mono" placeholder="https://example.com/*">
+    <p class="hint">A Chrome match pattern. <code>*://*/*</code> for a generic fix that works on any site; the site's own origin for a site-specific one.</p>
+
+    <label for="script">Script</label>
+    <div class="examples"><span class="dim small">Start from an example:</span> <select id="example" aria-label="Examples"><option value="">choose</option></select></div>
+    <textarea id="script" rows="14" spellcheck="false" placeholder="await page.title.set('Ops dashboard');"></textarea>
+    <p class="hint">The script is the body of an <code>async</code> function. It sees one object, <code>page</code>, with the capabilities ticked below, and <code>log()</code>. Nothing else exists in its world: no <code>document</code>, no <code>window</code>, no network.</p>
+
+    <fieldset id="policy">
+      <legend>Policy: what this script may do</legend>
+      <div id="caps" class="caps"></div>
+      <div class="limits">
+        <label class="inline">At most <input id="limit-calls" type="number" min="1" max="1000" value="100"> calls</label>
+        <label class="inline">and <input id="limit-ms" type="number" min="1" max="30000" value="5000"> ms</label>
+      </div>
+    </fieldset>
+
+    <div id="lint" class="lint" aria-live="polite"></div>
+
+    <div class="buttons">
+      <button id="run" type="button" class="primary">Run on this tab</button>
+      <button id="undo" type="button">Undo this run</button>
+      <button id="undo-all" type="button">Undo every run</button>
+      <button id="save" type="button">Save</button>
+      <button id="new" type="button">New</button>
+    </div>
+    <p id="message" class="message" role="status" aria-live="polite"></p>
+
+    <h2>What the run did</h2>
+    <ol id="log" class="log" aria-live="polite"></ol>
+  </section>
+
+  <aside class="col side">
+    <div class="sechead">
+      <h2>Saved experiments</h2>
+      <div class="tools">
+        <button id="export" type="button">Export</button>
+        <label class="btn" for="import-file">Import<input id="import-file" type="file" accept="application/json,.json"></label>
+      </div>
+    </div>
+    <p class="dim small">Kept in this browser only (<code>chrome.storage.local</code>). Export to a file to share them.</p>
+    <p id="experiments-empty" class="empty" hidden>Nothing saved yet.</p>
+    <div id="experiments"></div>
+    <p id="side-message" class="message" role="status" aria-live="polite"></p>
+
+    <h2>The policy, as JSON</h2>
+    <pre id="policy-json" class="json"></pre>
+    <button id="copy" type="button">Copy experiment as JSON</button>
+  </aside>
+</main>
+
+<iframe id="sandbox" src="sandbox.html" sandbox="allow-scripts" title="The sandbox the script runs in" hidden></iframe>
+
+<template id="experiment-row">
+  <article class="experiment">
+    <div class="x-main"><b class="x-name"></b> <span class="x-scope"></span></div>
+    <code class="x-match"></code>
+    <div class="x-caps dim small"></div>
+    <div class="x-actions">
+      <button type="button" class="x-load">Open</button>
+      <button type="button" class="x-delete danger">Delete</button>
+    </div>
+  </article>
+</template>
+
+<script src="engine.js"></script>
+<script src="sbp.js"></script>
+<script src="playground.js"></script>
+</body>
+</html>

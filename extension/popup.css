@@ -6,6 +6,7 @@ header{display:flex;align-items:baseline;justify-content:space-between;padding:.
 h1{margin:0;font-size:1rem;letter-spacing:-.01em}
 h1::before{content:"";display:inline-block;width:.7em;height:.7em;background:var(--accent);border-radius:3px;margin-right:.45em;vertical-align:-1px}
 header a{font-size:.8rem;color:var(--accent-dk)}
+header .links{font-size:.8rem;color:var(--dim)}
 a{color:var(--accent-dk)}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .panel{margin:.4rem .9rem .9rem;padding:.7rem .8rem;background:var(--panel);border:1px solid var(--line);border-radius:8px}

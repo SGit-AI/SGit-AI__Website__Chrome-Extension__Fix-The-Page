@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Script Behaviour Policies: a behaviour policy for a line of JavaScript · Fix the Page</title>
+<meta name="description" content="The Agent Behaviour Policy model applied to a script: what it may do (the mandate), what a script on a page can do (the grant), the delta, and where each line is enforced, statically and at run time, by something the script cannot reach. Running in Fix the Page&#x27;s playground.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/articles/script-behaviour-policies/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/articles/script-behaviour-policies/index.html">
+<meta property="og:title" content="Script Behaviour Policies: a behaviour policy for a line of JavaScript · Fix the Page">
+<meta property="og:description" content="The Agent Behaviour Policy model applied to a script: what it may do (the mandate), what a script on a page can do (the grant), the delta, and where each line is enforced, statically and at run time, by something the script cannot reach. Running in Fix the Page&#x27;s playground.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="../../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <a class="nl" href="../../install/index.html">Install</a>
+  <a class="nl" href="../../use/title/index.html">The title fix</a>
+  <a class="nl" href="../../use/playground/index.html">Playground</a>
+  <a class="nl here" href="../../articles/index.html">Articles</a>
+  <a class="nl" href="../../permissions/index.html">Permissions</a>
+  <a class="nl" href="../../privacy/index.html">Privacy</a>
+  <a class="nl" href="../../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / <a href="../index.html">articles</a> / script behaviour policies</div>
+<h1>Script Behaviour Policies: a behaviour policy for a line of JavaScript</h1>
+<p class="small dim">By Dinis Cruz, written up by this site's agent · 25 October 2026 · published · <a href="index.md">markdown twin</a></p>
+<p class="lead">A line of JavaScript on a page can do everything the page can: read every field, every cookie the page can see, send it anywhere, rewrite anything. A fix that sets the tab's title has the same reach as one that empties your inbox. That is ridiculous, and it is normal. The Agent Behaviour Policy writes down what an agent can reach, what you asked of it, the gap, and what stands in the way; the Process Behaviour Policy did the same for a process. This article does it for a script: the Script Behaviour Policy, a short document that says a script may set the title and nothing else, checked when the script is read and enforced while it runs, by something the script cannot reach. The first one is running in Fix the Page's playground. <span class="status status-built">built</span></p>
+
+<h2 id="in-short">In short</h2>
+<ul>
+  <li><b>A script's grant is the whole page.</b> Whatever a page can do, any script on it can do: the DOM, the network, storage, navigation, the clipboard on a click. There is no smaller unit of trust in the platform.</li>
+  <li><b>The mandate is almost always one line.</b> "Set the title." "Hide that banner." "Make the text bigger." The gap between the two is the problem, and it is the same gap the ABP was built to write down.</li>
+  <li><b>A Script Behaviour Policy is a list of capabilities and limits.</b> <code>title.set</code>, and at most a hundred calls in five seconds. Eight capabilities exist today. A name not in the vocabulary cannot be granted and will not be performed.</li>
+  <li><b>Static review is the lint, the reviewer and the CI.</b> Compare what the script calls with what the policy grants; refuse names that have no place in a fix; keep the policy as tight as the script. Advice, with a barrier of the expectation kind, until CI refuses the merge.</li>
+  <li><b>Runtime enforcement is a realm with nothing in it.</b> The script runs in a sandboxed page with an opaque origin and no network. It sees one object, <code>page</code>, whose methods post messages. The playground, in another realm, checks every message against the policy; the engine on the page checks the arguments again and keeps an undo log. The script cannot reach either of them.</li>
+  <li><b>"A control bounds a grant only if it is enforced by something the grant does not include."</b> That is the ABP's test, and it is the design rule here: the gate is never in the script's realm.</li>
+  <li><b>Every fix becomes a small application.</b> A script, its policy, a README that says the same thing, tests on a fixture page, a review. That is the shape a community library needs, and the shape a reviewing agent can be given as a skill.</li>
+</ul>
+
+<h2 id="grant">The grant of a script is the page</h2>
+<p>Chrome's own documentation on content scripts says they "live in an isolated world" where "JavaScript variables in an extension's content scripts are not visible to the host page", while content scripts and the host page "share access to the page's DOM". That isolation protects the extension from the page and the page from the extension's variables. It does nothing to narrow what a script may do to the page. Here is the grant, measured the way the ABP measures one, for a script that runs with the page's DOM:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Capability of a script on a page</th><th>Through</th><th>The title fix needs it</th></tr></thead>
+  <tbody>
+    <tr><td>Read any element: text, inputs, passwords typed so far, hidden fields</td><td><code>document.querySelector</code>, <code>.value</code></td><td>no</td></tr>
+    <tr><td>Change any element: text, attributes, styles, remove, insert, submit a form, click a button</td><td>the DOM</td><td>one of them: the title</td></tr>
+    <tr><td>Read cookies the page can see; read and write its local storage</td><td><code>document.cookie</code>, <code>localStorage</code></td><td>no</td></tr>
+    <tr><td>Open a connection anywhere the page's policy allows, and send what it read</td><td><code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>sendBeacon</code>, an <code>&lt;img src&gt;</code></td><td>no</td></tr>
+    <tr><td>Navigate the page, open windows, rewrite history</td><td><code>location</code>, <code>window.open</code>, <code>history</code></td><td>no</td></tr>
+    <tr><td>Load more code, from text or from the web</td><td><code>eval</code>, <code>new Function</code>, a <code>&lt;script src&gt;</code></td><td>no</td></tr>
+    <tr><td>Run forever, allocate without limit</td><td>a loop</td><td>no</td></tr>
+  </tbody>
+</table></div>
+<p>Seven rows; the mandate touches one of them, partially. Every other row is excess, and in the usual arrangement (a bookmarklet, a userscript manager, an extension with host permissions) the barrier on every row is the first kind: <b>none</b>. The reviewer's "I read it and it only sets the title" is the second kind, an expectation. The ABP's words: "a rule in prose, enforced by nobody".</p>
+
+<h2 id="mapping">From ABP, through PBP, to SBP</h2>
+<p>The <a href="https://abp.sgit.ai/">Agent Behaviour Policy</a> is four objects: "the mandate (elicited), the grant (measured), the delta (derived), the barrier (recorded per capability, from one of four kinds)". The <a href="https://cli.sgit.ai/dev/sealed-vault-keys/03-process-behaviour-policy.html">Process Behaviour Policy</a> applied them to a process, where the kernel can make almost every line a boundary, and added two rules that transfer: layers can only narrow ("the effective policy is the intersection"), and "a business rule is only a Boundary if it is enforced in a different process from the one it constrains". For a script, the different process is a different realm.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>Object</th><th>Agent Behaviour Policy</th><th>Process Behaviour Policy</th><th>Script Behaviour Policy</th></tr></thead>
+  <tbody>
+    <tr><td><b>Subject</b></td><td>one agent in one deployment</td><td>one process, one subcommand, one invocation</td><td>one script, on the pages its match pattern names, for one run</td></tr>
+    <tr><td><b>Mandate</b> (elicited)</td><td>the job the deployer asked for</td><td>files, hosts, syscalls, IPC edges, limits</td><td>the capabilities ticked: <code>title.set</code>; limits on calls and time; optionally the selectors it may name</td></tr>
+    <tr><td><b>Grant</b> (measured)</td><td>everything the account, machine and tools permit</td><td>uid plus environment, by default everything</td><td>the table above: everything the page can do</td></tr>
+    <tr><td><b>Delta</b> (derived)</td><td>grant minus mandate</td><td>recomputed per release and policy version</td><td>the lint computes it live: calls the policy does not grant, grants the script does not use</td></tr>
+    <tr><td><b>Barrier</b> (recorded)</td><td>none, expectation, setting, boundary</td><td>mostly boundary: Landlock, seccomp, namespaces</td><td>see the next table</td></tr>
+    <tr><td><b>Layers</b></td><td>the deployment shape</td><td>L0 OS to L5 invocation, intersection only</td><td>L0 the extension's manifest, L1 the engine's vocabulary, L2 the policy, L3 the run; intersection only</td></tr>
+    <tr><td><b>Who enforces</b></td><td>a gateway, proxy or IAM above the agent</td><td>the kernel, and a component in another process</td><td>the playground page and the engine, two realms the script cannot reach</td></tr>
+    <tr><td><b>Hash</b></td><td>the vault's record</td><td>canonical JSON, supplied from outside</td><td>proposed: the policy hashed with the script, signed by the author's key</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="barriers">Where each line is enforced</h2>
+<p>The ABP's four kinds, applied to one script's policy. The test is the ABP's: a control bounds a grant only if it is enforced by something the grant does not include.</p>
+<div class="tablewrap"><table>
+  <thead><tr><th>What stands in the way</th><th>Kind</th><th>Why that kind</th></tr></thead>
+  <tbody>
+    <tr><td>A reviewer reads the script and says it only sets the title</td><td><span class="claim claim-read">expectation</span></td><td>Prose, enforced by nobody at run time. Necessary; not sufficient.</td></tr>
+    <tr><td>The lint: calls versus grants, banned names, unused grants</td><td><span class="claim claim-read">expectation</span></td><td>Advice the author can read and ignore, and a regex that a determined script can hide from. In CI, refusing the merge, it becomes a boundary for the repository and still not for the running script.</td></tr>
+    <tr><td>Shadowing <code>window</code>, <code>document</code>, <code>fetch</code> and the rest as undefined inside the script's function</td><td><span class="claim claim-read">setting</span></td><td>The script's own realm, so the script can undo it: <code>(async () =&gt; {}).constructor</code> reaches the real function constructor. The tests do exactly that, and show what it finds.</td></tr>
+    <tr><td>The sandboxed page: Chrome's <code>sandbox</code> manifest key, "served in a sandboxed unique origin", which "won't have access to extension APIs"</td><td><span class="claim claim-measured">boundary</span></td><td>Enforced by the browser, above the script. What the escape finds is an empty page with no extension API and no page to touch.</td></tr>
+    <tr><td>The sandbox's Content Security Policy: <code>connect-src 'none'</code>, no frames, no images, no forms</td><td><span class="claim claim-measured">boundary</span></td><td>Enforced by the browser. A <code>fetch</code> from the escaped window is refused; the test checks it.</td></tr>
+    <tr><td>The gate: the playground checks every message against the policy</td><td><span class="claim claim-measured">boundary</span></td><td>Another realm, an extension page the sandbox cannot script. A forged message, from the script or from anyone, meets the same check. "A business rule is only a Boundary if it is enforced in a different process from the one it constrains."</td></tr>
+    <tr><td>The engine: checks the arguments again, knows eight verbs, bounds every one, logs every effect</td><td><span class="claim claim-measured">boundary</span></td><td>A third realm, the page's isolated world. It never sees the policy, and it does not need to: it cannot do anything outside its vocabulary.</td></tr>
+    <tr><td>The limits: calls and milliseconds</td><td><span class="claim claim-measured">boundary</span>, partly</td><td>Counted in the sandbox and again in the gate. A tight synchronous loop is the exception: it cannot be interrupted from outside, and it freezes the sandbox's thread until the browser intervenes. Recorded as a gap, below.</td></tr>
+  </tbody>
+</table></div>
+<p>Read the kinds down the column and the shape is the same as the PBP's: the lines that bind are the ones the browser or another realm enforces. The two expectation rows are not worthless, they are where a reader learns what the script does; they are just not what stops it.</p>
+
+<h2 id="layers">Layers that can only narrow</h2>
+<pre class="shell"><span class="d">┌─ L0 the extension's manifest ─────────────────────────────────────────────────────┐
+│  activeTab; no host permissions; no network (CSP connect-src 'none'); 4 permissions  │
+│ ┌─ L1 the engine's vocabulary ──────────────────────────────────────────────────┐  │
+│ │  8 verbs; selectors ≤ 500 chars; 200 elements per hide; 20000 chars of CSS; undo │  │
+│ │ ┌─ L2 the policy ──────────────────────────────────────────────────────────┐ │  │
+│ │ │  capabilities: [title.set]; limits: 100 calls, 5000 ms; selectors: none   │ │  │
+│ │ │ ┌─ L3 the run ────────────────────────────────────────────────────────┐ │ │  │
+│ │ │ │  this tab, this URL, this press of Run; effective = L0 ∩ L1 ∩ L2 ∩ L3 │ │ │  │
+│ │ │ └──────────────────────────────────────────────────────────────────────┘ │ │  │
+│ │ └──────────────────────────────────────────────────────────────────────────┘ │  │
+│ └──────────────────────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────────────────────────┘</span></pre>
+<p>No layer can grant what the one above refused. A policy cannot ask for <code>network.send</code>, because L1 has no such verb. A run cannot reach a tab the popup was not opened on, because L0 has no host permission for it. This is the PBP's intersection rule, and it is also why the vocabulary grows slowly: every verb added to L1 is a verb every policy could ask for.</p>
+
+<h2 id="static">Static enforcement: the review</h2>
+<p>Three readers, in order of cost.</p>
+<ol>
+  <li><b>The lint, as you type.</b> It finds every <code>page.x.y(</code> in the script and compares the list with the policy. A call the policy does not grant: not ready to run. A grant the script does not use: untick it, so the policy is as tight as the script. A name from the banned list (<code>window</code>, <code>document</code>, <code>fetch</code>, <code>eval</code>, <code>chrome</code>, <code>constructor</code> and thirty more): not ready to run, with the line number. It is a regex, not a parser; it says so.</li>
+  <li><b>A reviewer, human or agent, with the policy in one hand and the README in the other.</b> The question is not "is this code safe" (the runtime answers that) but "does this fix do what it says, and no more than its policy, and is the policy as small as the job". For an agent that is a skill: read the three files, compute the delta, say it in one paragraph.</li>
+  <li><b>CI, for a library.</b> The same lint as a gate; the tests under the sandbox harness; a check that every capability the README names is in the policy and every capability in the policy is named in the README. <a href="../../admin/plans/index.html#library">The plan</a> has the shape of the repository.</li>
+</ol>
+
+<h2 id="runtime">Runtime enforcement: the realm with nothing in it</h2>
+<pre class="shell"><span class="d">the script's realm            the gate                      the page's isolated world
+(sandbox.html, opaque         (playground.html,             (engine.js, injected with
+ origin, connect-src 'none')   an extension page)            activeTab or a granted origin)
+
+ page.title.set('Ops')  ──msg──►  checkCall(policy, call)
+                                  ├─ not granted ──► refused, logged, error back to the script
+                                  └─ granted ────────msg────►  cap('title.set', ['Ops'])
+                                                              ├─ argument checks
+                                                              ├─ effect recorded for Undo
+                                                              └─ document.title = 'Ops'
+ (nothing else exists here)   ◄──result────────────────────◄──value</span></pre>
+<ol>
+  <li>The playground builds the policy from the ticked boxes and runs the lint. Not clean, no run.</li>
+  <li>It posts the script, the capability list and the limits to the sandbox iframe. Chrome's manifest reference says a sandboxed page is "served in a sandboxed unique origin" and "won't have access to extension APIs"; it "may communicate with them using <code>postMessage()</code>". Ours also has a Content Security Policy of <code>sandbox allow-scripts; script-src 'self' 'unsafe-eval'; connect-src 'none'</code> and nothing else allowed, which the validator checks on every build.</li>
+  <li>The sandbox makes a <code>page</code> object whose methods are the granted capabilities and nothing else, builds the script into a function with the usual globals shadowed, and runs it under a timer.</li>
+  <li>Each call becomes a message. The playground is the gate: <code>checkCall(policy, call)</code> is a pure function (tested in Node) that refuses anything not granted, any wrong argument shape, any selector outside an allowlist if one is set. Refusals are written in the run log, in words.</li>
+  <li>Allowed calls go to the engine on the tab, which checks the arguments again, applies the effect, and records it. <b>Undo</b> reverses a run's effects in reverse order: hidden elements shown, text restored, stylesheets removed, the title released.</li>
+  <li>When the script ends, or the timer fires, the run is closed and later messages for it are refused.</li>
+</ol>
+<p>The same message gate meets a message the script did not send through <code>page</code>. The test suite escapes the shadowing on purpose, through the async function constructor, and reports what it finds: the sandbox's own window, with no extension API, no page, and a <code>fetch</code> the CSP refuses.</p>
+
+<h2 id="example">The worked example</h2>
+<p>The fix Dinis asked for first, as a policy and a script:</p>
+<pre class="shell">{
+  "policy": "fix-the-page/sbp",
+  "version": 1,
+  "capabilities": ["title.set"],
+  "limits": { "calls": 100, "ms": 5000 }
+}
+
+<span class="d">// the script: the body of an async function; it sees page and log, nothing else</span>
+await page.title.set('Ops dashboard');</pre>
+<p>Change the script to <code>await page.css.add('body { display: none }')</code> and the lint says: the script calls <code>css.add</code> but the policy does not grant it. Tick nothing and press Run anyway through the test hook, and the gate says: <code>refused page.css.add("body { display: none }"): css.add is not in the policy</code>. The page is unchanged. That is the whole idea in two lines of log.</p>
+
+<h2 id="numbers">What fits in eight verbs</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Fix</th><th>Capabilities</th><th>Fits today</th></tr></thead>
+  <tbody>
+    <tr><td>Set, prefix or template the title</td><td><code>title.get</code>, <code>title.set</code>, <code>url.get</code></td><td>yes</td></tr>
+    <tr><td>Bigger text, high contrast, text spacing (three of the newsroom's six)</td><td><code>css.add</code></td><td>yes</td></tr>
+    <tr><td>Hide a banner, a sticky bar, a feed</td><td><code>dom.count</code>, <code>dom.hide</code></td><td>yes; site-specific when it names the element, best effort when it guesses</td></tr>
+    <tr><td>Rename a heading or a button's label</td><td><code>dom.text</code>, <code>dom.setText</code></td><td>yes</td></tr>
+    <tr><td>Reading mode</td><td><code>css.add</code>, <code>dom.hide</code></td><td>best effort, as the article warned</td></tr>
+    <tr><td>Outline of the headings</td><td>would need <code>dom.insert</code></td><td>not yet: inserting markup is a verb with its own argument rules</td></tr>
+    <tr><td>Open the markdown twin</td><td>would need <code>page.navigate</code></td><td>not yet, and perhaps never: navigation leaves the page, which Undo cannot reverse</td></tr>
+    <tr><td>Call a site's own page API by name</td><td>would need <code>site.apply</code></td><td>not yet: the thesis of the original article, and the next verb worth adding</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="community">Every fix is a small application</h2>
+<p>For a library that strangers contribute to, the policy is what makes review possible at all. The proposed shape of one fix, generic or site-specific:</p>
+<pre class="shell"><span class="cy">fixes/example.com/hide-cookie-banner/</span>   <span class="d">or  fixes/generic/bigger-text/</span>
+  fix.json      name, match, the policy, author, version, licence
+  fix.js        the script, the body of an async function over page and log
+  README.md     what it does, in words a reader can compare with the policy
+  tests/        a fixture page and what the fix must change, run under the sandbox harness
+  REVIEW.md     who read it, the delta they computed, when; later, a signature</pre>
+<p>CI runs the lint, runs the tests, compares README with policy, and refuses the merge otherwise. A reviewing agent gets the same three files and a skill that says what to look for. The barrier on the repository is a boundary; the barrier on the running fix is the runtime's, as above, and it does not depend on the reviewer having been right. Later, the policy and the script are hashed together and signed with a key the <a href="https://pki.sgit.ai/">pki.sgit.ai</a> register vouches for, as the newsroom's Pen signs notes, and a fix changed after signing fails to load.</p>
+
+<h2 id="not-claim">What this does not claim</h2>
+<ul>
+  <li><b>Not a boundary against a malicious extension.</b> The gate and the engine are our code, inside the extension. A reader who installs the extension trusts the extension; the policy bounds the scripts, not the thing that runs them. The source is public so that trust can be checked.</li>
+  <li><b>A bug in a capability is a bug in the boundary.</b> If <code>dom.setText</code> could be made to run markup, the policy would still say <code>dom.setText</code>. The vocabulary is small so that each verb can be read, bounded and tested.</li>
+  <li><b>The lint is advice.</b> It reads a regex's view of the script. The gate does not depend on it.</li>
+  <li><b>A tight synchronous loop is not stopped.</b> The timer fires only when the script yields. The sandbox's thread freezes; the page it was going to fix does not. A gap, recorded here as the ABP's gaps register would.</li>
+  <li><b>A policy describes and does not judge.</b> <code>css.add</code> is harmless on a newspaper and can hide the pay button on a shop. Whether a fix is safe is a property of the site it runs on and the person who kept it, not of its policy. The ABP says it of deployments; it is true of pages.</li>
+  <li><b>One realm, one run.</b> Saved experiments run when you press Run, with the playground open. Running them on their own, at load, on a granted site, is specified and not built.</li>
+  <li><b>Eight verbs.</b> A start, not a library.</li>
+</ul>
+
+<h2 id="sources">Where this comes from</h2>
+<p>A memo from Dinis Cruz on 25 October 2026, after the first install: start with the extension installed from a clone; the first easy fix is <code>document.title</code>; then site-specific fixes, a playground to prototype them and keep them, a community that contributes them, each one a small application with a review and security checks, and a behaviour policy for scripts that limits what a script can do, enforced both by static analysis and at run time. The model is the Agent Behaviour Policy at <a href="https://abp.sgit.ai/">abp.sgit.ai</a> and <a href="https://riskmandate.ai/abp.html">riskmandate.ai</a> ("the mandate, the grant, the delta and the barrier", the four barrier kinds, "a control bounds a grant only if it is enforced by something the grant does not include"), and the Process Behaviour Policy in cli.sgit.ai's <a href="https://cli.sgit.ai/dev/sealed-vault-keys/03-process-behaviour-policy.html">sealed vault keys design pack</a> (layers that only narrow; who enforces decides the barrier kind). The idea of fixes as one-line calls on primitives is the newsroom's <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">Fix the page yourself</a>. Chrome facts are quoted from the <a href="https://developer.chrome.com/docs/extensions/reference/manifest/sandbox">sandbox manifest reference</a> and the <a href="https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts">content scripts</a> page, fetched on 25 October 2026. The code is in <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page/tree/dev/extension"><code>extension/</code></a>: <code>sbp.js</code>, <code>sandbox.js</code>, <code>playground.js</code> and the capability half of <code>engine.js</code>, with the tests in <code>tests/</code>.</p>
+
+<div class="note"><b>For an agent.</b> A Script Behaviour Policy is <code>{ "policy": "fix-the-page/sbp", "version": 1, "capabilities": [...], "limits": { "calls": n, "ms": n }, "selectors": [...]? }</code>. The capability vocabulary is the eight names in <code>extension/sbp.js</code>. To review a fix: compute the calls the script makes (<code>page.x.y(</code>), compare with the policy, name the delta both ways, check the README names the same capabilities, run the tests under <code>tests/fixtures/sandbox-host.html</code>. The gate is <code>checkCall(policy, call)</code>; the lint is <code>lintScript(script, policy)</code>; both are pure and run in Node.</div>
+
+<div class="pagenav">
+  <a href="../index.html">&larr; Articles</a>
+  <a href="../../use/playground/index.html">The playground &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../../install/index.html">Install</a>
+    <a href="../../use/title/index.html">The title fix</a>
+    <a href="../../permissions/index.html">Permissions</a>
+    <a href="../../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../../source/index.html">Source and releases</a>
+    <a href="../../admin/versions.html">Release history</a>
+    <a href="../../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../../assets/version.js"></script>
+</body>
+</html>

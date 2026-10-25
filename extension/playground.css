@@ -1,0 +1,65 @@
+:root{--bg:#faf9f5;--panel:#fff;--panel2:#f2f0e9;--line:#e5e1d5;--fg:#1c1d21;--dim:#5c5f66;--accent:#0f766e;--accent-dk:#115e59;--red:#b91c1c;--warm:#b45309;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans)}
+header.top{max-width:1180px;margin:0 auto;padding:1.6rem 1.2rem 0;display:flex;gap:1.5rem;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+header.top h1{font-size:1.4rem;margin:0 0 .3rem;letter-spacing:-.015em}
+header.top h1::before{content:"";display:inline-block;width:.65em;height:.65em;background:var(--accent);border-radius:4px;margin-right:.45em;vertical-align:-1px}
+header.top p{margin:0;max-width:760px}
+nav.links{white-space:nowrap;font-size:.9rem}
+a{color:var(--accent-dk)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.btn:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.dim{color:var(--dim)} .small{font-size:.85rem}
+.panel{max-width:1180px;margin:1rem auto 0;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.panel.warn{border-left:4px solid var(--warm)}
+.panel p{margin:.2rem 0}
+main.grid{max-width:1180px;margin:0 auto;padding:1rem 1.2rem 3rem;display:grid;grid-template-columns:minmax(0,3fr) minmax(280px,2fr);gap:1.6rem}
+@media (max-width:860px){main.grid{grid-template-columns:1fr}}
+h2{font-size:1rem;margin:1.4rem 0 .5rem}
+.page{padding:.55rem .7rem;background:var(--panel2);border:1px solid var(--line);border-radius:8px;margin-bottom:.8rem}
+.ptitle{font-weight:600;overflow-wrap:anywhere}
+.purl{font-family:var(--mono);font-size:.75rem;color:var(--dim);overflow-wrap:anywhere}
+label{display:block;font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);margin:.7rem 0 .2rem}
+label.inline{display:inline;text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;color:var(--fg);margin:0 .8rem 0 0}
+input[type=text],textarea,select{width:100%;padding:.45rem .55rem;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);font:inherit}
+input[type=number]{width:5.5rem;padding:.25rem .4rem;border:1px solid var(--line);border-radius:6px;font:inherit}
+.mono,textarea{font-family:var(--mono);font-size:.85rem}
+textarea{line-height:1.45;resize:vertical;tab-size:2}
+.examples{display:flex;align-items:center;gap:.5rem;margin:.2rem 0 .3rem}
+.examples select{width:auto;padding:.25rem .4rem;font-size:.85rem}
+.hint{margin:.25rem 0 0;font-size:.78rem;color:var(--dim)}
+.hint code,.caps code{font-family:var(--mono);background:var(--panel2);padding:0 .25em;border-radius:3px;font-size:.9em}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:.6rem .9rem .8rem;margin:1rem 0 0;background:var(--panel)}
+legend{font-size:.75rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);padding:0 .3rem}
+.caps{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.2rem .8rem}
+.caps label{display:flex;gap:.45rem;align-items:flex-start;text-transform:none;letter-spacing:0;font-weight:400;font-size:.88rem;color:var(--fg);margin:.15rem 0}
+.caps label input{margin-top:.25rem}
+.caps .kind{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;padding:.02rem .4rem;border:1px solid;margin-left:.2rem;vertical-align:middle}
+.kind-read{color:var(--accent-dk);border-color:rgba(15,118,110,.35)} .kind-write{color:var(--warm);border-color:rgba(180,83,9,.35)}
+.limits{margin-top:.6rem;font-size:.9rem}
+.lint{margin:.7rem 0 0;font-size:.85rem;padding:.5rem .7rem;border-radius:8px;border:1px solid var(--line);background:var(--panel)}
+.lint.ok{border-left:4px solid var(--accent)} .lint.bad{border-left:4px solid var(--red)}
+.lint ul{margin:.2rem 0 0;padding-left:1.1rem} .lint li{margin:.1rem 0}
+.buttons{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.9rem}
+button,.btn{font:inherit;font-size:.9rem;padding:.4rem .8rem;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;display:inline-block}
+button.primary{background:var(--accent-dk);border-color:var(--accent-dk);color:#fff;font-weight:600}
+button.danger{color:var(--red)}
+button:hover,.btn:hover{border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+.btn input{position:absolute;width:1px;height:1px;opacity:0}
+.tools{display:flex;gap:.5rem;position:relative}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.message{min-height:1.3em;font-size:.9rem;color:var(--accent-dk);margin:.5rem 0 0}
+.message.err{color:var(--red)}
+ol.log{margin:0;padding-left:1.4rem;font-family:var(--mono);font-size:.8rem;background:var(--panel);border:1px solid var(--line);border-radius:8px;min-height:3rem;padding:.6rem .6rem .6rem 2rem}
+ol.log li{margin:.15rem 0;overflow-wrap:anywhere}
+ol.log li.refused{color:var(--red)} ol.log li.ok{color:var(--accent-dk)} ol.log li.note{color:var(--dim)}
+.empty{color:var(--dim);background:var(--panel2);border:1px dashed var(--line);border-radius:8px;padding:.6rem .8rem;font-size:.9rem}
+.experiment{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.6rem .8rem;margin:.5rem 0}
+.x-scope{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;border-radius:99px;padding:.05rem .45rem;border:1px solid var(--line);color:var(--dim);margin-left:.3rem}
+.x-match{display:block;font-family:var(--mono);font-size:.75rem;color:var(--dim);margin:.15rem 0;overflow-wrap:anywhere}
+.x-actions{display:flex;gap:.4rem;margin-top:.4rem}
+pre.json{font-family:var(--mono);font-size:.75rem;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;overflow:auto;max-height:16rem;margin:0 0 .5rem}
+iframe#sandbox{width:0;height:0;border:0}
+
+label.btn{display:inline-block;text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;color:var(--fg);margin:0}

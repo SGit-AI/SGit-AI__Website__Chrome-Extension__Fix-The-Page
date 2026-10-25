@@ -20,10 +20,12 @@
 <nav class="site"><div class="row">
   <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.1 · the title fix</span>
-  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
   <a class="nl" href="../install/index.html">Install</a>
   <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../use/playground/index.html">Playground</a>
+  <a class="nl" href="../articles/index.html">Articles</a>
   <a class="nl" href="../permissions/index.html">Permissions</a>
   <a class="nl" href="../privacy/index.html">Privacy</a>
   <a class="nl" href="../source/index.html">Source</a>
@@ -38,9 +40,14 @@
   <thead><tr><th>Version</th><th>Date</th><th>What shipped</th></tr></thead>
   <tbody>
     <tr>
+      <td class="vnum">v0.2.0</td>
+      <td>25 October 2026</td>
+      <td>The playground and Script Behaviour Policies. <b>The extension:</b> a playground page where a fix is written as a script and run on the tab the popup was opened on; a Script Behaviour Policy per script (a list of capabilities and limits), a static review that compares what the script calls with what the policy grants and refuses banned names, and a runtime gate that checks every capability call against the policy before it reaches the page; a sandbox page (Chrome's <code>sandbox</code> manifest key, an opaque origin, a CSP with <code>connect-src 'none'</code>) in which the script sees nothing but <code>page</code> and <code>log</code>; eight reversible capabilities in the engine (<code>title.get</code>, <code>title.set</code>, <code>url.get</code>, <code>dom.count</code>, <code>dom.text</code>, <code>dom.hide</code>, <code>dom.setText</code>, <code>css.add</code>) with an effects log per run and Undo; saved experiments in <code>chrome.storage.local</code>, generic or site-specific by their match pattern, with export, import and copy as JSON; seven starter examples. <b>The validator:</b> comments and strings are blanked before the code bans run; <code>new Function</code> is allowed in <code>sandbox.js</code> alone; an <code>&lt;iframe&gt;</code> may only point at a declared sandbox page; the sandbox CSP must set <code>connect-src 'none'</code> and allow nothing but scripts. <b>The tests:</b> 45 tests of the policy core, 13 more engine-in-a-page tests (capabilities, undo, the sandbox realm under its CSP including the escape that gains nothing), 5 playground tests in Chromium; 214 in all. <b>The site:</b> the article <a href="../articles/script-behaviour-policies/index.html">Script Behaviour Policies</a> with the mapping from Agent and Process Behaviour Policies; the <a href="plans/index.html">plan</a> to split the extension from the site and start a library of fixes; the playground page; navigation.</td>
+    </tr>
+    <tr>
       <td class="vnum">v0.1.0</td>
       <td>24 October 2026</td>
-      <td>First MVP, built from the briefing pack. <b>The extension:</b> Manifest V3 with <code>activeTab</code>, <code>scripting</code>, <code>storage</code> and <code>contextMenus</code>, optional host permissions for http and https, a CSP with <code>connect-src 'none'</code>; the title fix with <code>set</code>, <code>prefix</code>, <code>suffix</code> and <code>template</code> modes; on-demand apply through <code>activeTab</code>; persistent per-site rules through <code>optional_host_permissions</code> and <code>registerContentScripts</code>; an engine that holds the title against rewrites and route changes, undoes, and is idempotent; the popup with preview, pattern, "Always on this site", Undo and the restricted-page message; "My rules" with edit, enable, delete, export, import, site access removal and the build stamp; the keyboard shortcut and the context menu item; detection of a site's page API. <b>The release:</b> <code>releases/fix-the-page-v0.1.0.zip</code> and its SHA-256, built deterministically by <code>package.mjs</code>. <b>The tests:</b> 97 unit tests of the engine's core, 11 engine-in-a-page tests and 12 extension-in-Chromium tests with Playwright, 31 validator tests, and a runner that fails if a test file is not run. <b>The site:</b> this page, the front page, install (from a clone or from the zip, with screenshots), the title fix, permissions with Chrome's documentation quoted, privacy, source and releases, markdown twins, <code>llms.txt</code>, and the validate → test → tag → deploy pipeline copied from the hub with a test job added.</td>
+      <td>First MVP, built from the briefing pack. <b>The extension:</b> Manifest V3 with <code>activeTab</code>, <code>scripting</code>, <code>storage</code> and <code>contextMenus</code>, optional host permissions for http and https, a CSP with <code>connect-src 'none'</code>; the title fix with <code>set</code>, <code>prefix</code>, <code>suffix</code> and <code>template</code> modes; on-demand apply through <code>activeTab</code>; persistent per-site rules through <code>optional_host_permissions</code> and <code>registerContentScripts</code>; an engine that holds the title against rewrites and route changes, undoes, and is idempotent; the popup with preview, pattern, "Always on this site", Undo and the restricted-page message; "My rules" with edit, enable, delete, export, import, site access removal and the build stamp; the keyboard shortcut and the context menu item; detection of a site's page API. <b>The release:</b> <code>releases/fix-the-page-v0.2.0.zip</code> and its SHA-256, built deterministically by <code>package.mjs</code>. <b>The tests:</b> 97 unit tests of the engine's core, 11 engine-in-a-page tests and 12 extension-in-Chromium tests with Playwright, 31 validator tests, and a runner that fails if a test file is not run. <b>The site:</b> this page, the front page, install (from a clone or from the zip, with screenshots), the title fix, permissions with Chrome's documentation quoted, privacy, source and releases, markdown twins, <code>llms.txt</code>, and the validate → test → tag → deploy pipeline copied from the hub with a test job added.</td>
     </tr>
   </tbody>
 </table></div>
@@ -56,7 +63,7 @@
     <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a></p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a></p>
   </div>
   <div>
     <h4>The extension</h4>

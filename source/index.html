@@ -21,10 +21,12 @@
 <nav class="site"><div class="row">
   <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.1 · the title fix</span>
-  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
   <a class="nl" href="../install/index.html">Install</a>
   <a class="nl" href="../use/title/index.html">The title fix</a>
+  <a class="nl" href="../use/playground/index.html">Playground</a>
+  <a class="nl" href="../articles/index.html">Articles</a>
   <a class="nl" href="../permissions/index.html">Permissions</a>
   <a class="nl" href="../privacy/index.html">Privacy</a>
   <a class="nl here" href="../source/index.html">Source</a>
@@ -40,10 +42,10 @@
 <div class="tablewrap"><table>
   <thead><tr><th>Version</th><th>File</th><th>SHA-256</th></tr></thead>
   <tbody>
-    <tr><td class="vnum" style="font-family:var(--mono);font-weight:700;color:var(--accent-dk)">v0.1.0</td><td><a href="../releases/fix-the-page-v0.1.0.zip">fix-the-page-v0.1.0.zip</a> · <a href="../releases/fix-the-page-v0.1.0.zip.sha256">.sha256</a></td><td><div class="hashbox"><code class="sha256">c53f64dc12def64e00a66c4d055de39e1c706914823592237e8f32ff99303419</code></div></td></tr>
+    <tr><td class="vnum" style="font-family:var(--mono);font-weight:700;color:var(--accent-dk)">v0.2.0</td><td><a href="../releases/fix-the-page-v0.2.0.zip">fix-the-page-v0.2.0.zip</a> · <a href="../releases/fix-the-page-v0.2.0.zip.sha256">.sha256</a></td><td><div class="hashbox"><code class="sha256">402ff0e1c0626136a1e37933ec0cb3a298a775ccf65c79fca5a7310ebca287e0</code></div></td></tr>
   </tbody>
 </table></div>
-<p>To check a download: <code>shasum -a 256 fix-the-page-v0.1.0.zip</code> (macOS, Linux) or <code>certutil -hashfile fix-the-page-v0.1.0.zip SHA256</code> (Windows) and compare with the hash above. The zip is built by <code>admin/build/package.mjs</code> from <code>extension/</code>, and the validator refuses a release whose zip differs from <code>extension/</code> in any byte, or whose hash file does not match. The site's version, the extension's version and the zip's name are one number: <a href="../admin/versions.html">the release history</a> has them all.</p>
+<p>To check a download: <code>shasum -a 256 fix-the-page-v0.2.0.zip</code> (macOS, Linux) or <code>certutil -hashfile fix-the-page-v0.2.0.zip SHA256</code> (Windows) and compare with the hash above. The zip is built by <code>admin/build/package.mjs</code> from <code>extension/</code>, and the validator refuses a release whose zip differs from <code>extension/</code> in any byte, or whose hash file does not match. The site's version, the extension's version and the zip's name are one number: <a href="../admin/versions.html">the release history</a> has them all.</p>
 
 <h2 id="files">The extension, file by file</h2>
 <div class="tablewrap"><table>
@@ -100,7 +102,7 @@
 <pre class="shell"><span class="g">$</span> git clone https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page.git
 <span class="g">$</span> cd SGit-AI__Website__Chrome-Extension__Fix-The-Page
 <span class="g">$</span> npm test                          <span class="d"># needs Node 22 and Playwright with Chromium</span>
-<span class="g">$</span> node admin/build/package.mjs      <span class="d"># releases/fix-the-page-v0.1.0.zip and its .sha256</span>
+<span class="g">$</span> node admin/build/package.mjs      <span class="d"># releases/fix-the-page-v0.2.0.zip and its .sha256</span>
 <span class="g">$</span> node admin/build/validate.js</pre>
 <p>The zip writer is deterministic: the same tree gives the same bytes, apart from the build stamp.</p>
 
@@ -119,7 +121,7 @@
     <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.1.0</a> · <a href="../releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
   </div>
   <div>
     <h4>The extension</h4>

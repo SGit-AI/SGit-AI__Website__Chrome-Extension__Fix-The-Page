@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The playground · Fix the Page</title>
+<meta name="description" content="Prototype a fix as a script under a policy: the eight capabilities, the static review, run and undo, generic versus site-specific, saving, exporting and importing experiments.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/use/playground/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/use/playground/index.html">
+<meta property="og:title" content="The playground · Fix the Page">
+<meta property="og:description" content="Prototype a fix as a script under a policy: the eight capabilities, the static review, run and undo, generic versus site-specific, saving, exporting and importing experiments.">
+<meta name="twitter:card" content="summary">
+<link rel="alternate" type="text/markdown" href="index.md" title="This page as markdown">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="../../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <a class="nl" href="../../install/index.html">Install</a>
+  <a class="nl" href="../../use/title/index.html">The title fix</a>
+  <a class="nl here" href="../../use/playground/index.html">Playground</a>
+  <a class="nl" href="../../articles/index.html">Articles</a>
+  <a class="nl" href="../../permissions/index.html">Permissions</a>
+  <a class="nl" href="../../privacy/index.html">Privacy</a>
+  <a class="nl" href="../../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / use / the playground</div>
+<h1>The playground</h1>
+<p class="lead">Where a fix is prototyped. Write a small script, tick what it may do, run it on the tab you came from, read what it did, undo it, keep it. Generic fixes and site-specific ones live side by side, told apart by where they apply. <span class="status status-built">built</span></p>
+
+<figure class="shot"><img src="../../install/images/playground.png" alt="The playground: the tab it works on, a script, the policy's capability tick boxes, the static review saying the policy grants exactly what the script asks for, and the run log listing each call and its effect" width="1180" height="1100" style="max-width:860px"><figcaption>The playground after a run: three calls applied under a policy of three capabilities, each logged, each undoable.</figcaption></figure>
+<h2 id="open">Opening it</h2>
+<p>Click the Fix the Page icon on the page you want to work on, then <b>Playground</b> at the top of the popup. The playground opens in a new tab, bound to the tab you came from; that binding is the <code>activeTab</code> grant the click gave the extension, so it lasts while that tab stays on its page. On a site you have allowed with "Always on this site", it lasts regardless. Opened on its own, the playground says so and still lets you write, save, export and import.</p>
+
+<h2 id="script">The script</h2>
+<p>The body of an <code>async</code> function. It sees one object, <code>page</code>, and <code>log()</code>. Nothing else exists in its world: no <code>document</code>, no <code>window</code>, no <code>fetch</code>, no <code>chrome</code>. The <a href="../../articles/script-behaviour-policies/index.html">article</a> explains why and how.</p>
+<pre class="shell">const title = await page.title.get();
+const url = await page.url.get();
+await page.title.set('[' + url.split('/')[2] + '] ' + title);
+log('done');</pre>
+<p>Every capability returns a promise, so <code>await</code> each one. Seven starter examples are in the "Start from an example" menu.</p>
+
+<h2 id="capabilities">The eight capabilities</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Call</th><th>Kind</th><th>Does</th><th>Returns</th><th>Undo</th></tr></thead>
+  <tbody>
+    <tr><td><code>page.title.get()</code></td><td>read</td><td>reads the tab's title</td><td>the title</td><td>nothing to undo</td></tr>
+    <tr><td><code>page.title.set(text)</code></td><td>write</td><td>sets the title and holds it against the page rewriting it, like a title rule</td><td>the title</td><td>the page's own title returns</td></tr>
+    <tr><td><code>page.url.get()</code></td><td>read</td><td>reads the page's address</td><td>the URL</td><td></td></tr>
+    <tr><td><code>page.dom.count(selector)</code></td><td>read</td><td>counts the elements a CSS selector matches</td><td>a number</td><td></td></tr>
+    <tr><td><code>page.dom.text(selector)</code></td><td>read</td><td>reads the text of the first match, up to 2000 characters</td><td>text, or null</td><td></td></tr>
+    <tr><td><code>page.dom.hide(selector)</code></td><td>write</td><td>hides every match, up to 200</td><td>how many</td><td>shown again</td></tr>
+    <tr><td><code>page.dom.setText(selector, text)</code></td><td>write</td><td>replaces the text of the first match</td><td>1 or 0</td><td>the old text returns</td></tr>
+    <tr><td><code>page.css.add(css)</code></td><td>write</td><td>adds a stylesheet, up to 20000 characters</td><td>its id</td><td>removed</td></tr>
+  </tbody>
+</table></div>
+<p>Selectors must be valid CSS and at most 500 characters; text at most 20000. The engine refuses anything else, whatever asked for it. There is no verb for the network, storage, cookies, navigation or inserting markup; a policy cannot grant what does not exist.</p>
+
+<h2 id="policy">The policy</h2>
+<p>Tick the capabilities the script needs, set the limits (at most 1000 calls and 30 seconds; the defaults are 100 and 5), and the policy appears as JSON on the right. The static review under the editor compares the script with the policy as you type:</p>
+<ul>
+  <li><b>The script calls something the policy does not grant:</b> not ready to run. Tick it, or take the call out.</li>
+  <li><b>The policy grants something the script never uses:</b> advice. Untick it, so the policy is as tight as the script.</li>
+  <li><b>A name that has no place in a fix</b> (<code>window</code>, <code>document</code>, <code>fetch</code>, <code>eval</code>, <code>chrome</code> and others): not ready to run, with the line number. The sandbox has none of them anyway; the lint saves you the run.</li>
+</ul>
+
+<h2 id="run">Run, read, undo</h2>
+<p><b>Run on this tab</b> sends the script to the sandbox. The log under the buttons shows each call as it happens: the call, what it returned, or why it was refused. When the run ends it lists the effects the engine recorded. <b>Undo this run</b> reverses them, in reverse order; <b>Undo every run</b> clears the tab of everything the playground did. Leaving or reloading the tab also clears it: nothing persists on the page.</p>
+
+<h2 id="where">Generic or site-specific</h2>
+<p>"Where it applies" is a Chrome match pattern, as for a title rule. <code>*://*/*</code> marks a generic fix, one that should work on any site, which is what the newsroom's CSS fixes are. The site's own origin, <code>https://example.com/*</code>, marks a site-specific one, which can name the exact element instead of guessing. The saved list labels each experiment accordingly. In 0.2 the pattern is a label and a record; running saved fixes on their own, on matching pages, is the next step and is not built.</p>
+
+<h2 id="keep">Keeping and sharing</h2>
+<ul>
+  <li><b>Save</b> keeps the experiment (name, pattern, policy, script, dates) in <code>chrome.storage.local</code>, in this browser only. <b>Open</b> loads it back; <b>Delete</b> removes it.</li>
+  <li><b>Export</b> writes every saved experiment to a JSON file; <b>Import</b> reads such a file back, replacing by id. A file is validated whole and refused with the experiment and field named if anything is off. Nothing in it runs until you open it and press Run.</li>
+  <li><b>Copy experiment as JSON</b> puts the one in the editor on the clipboard, to paste into a message, an issue or a pull request.</li>
+</ul>
+<pre class="shell">{
+  "format": "fix-the-page/experiments",
+  "version": 1,
+  "exported": "2026-10-25T10:00:00Z",
+  "experiments": [
+    {
+      "id": "x-2026-10-25-k3f9a1",
+      "name": "Hide the cookie banner on example.com",
+      "match": "https://example.com/*",
+      "policy": { "policy": "fix-the-page/sbp", "version": 1, "capabilities": ["dom.count", "dom.hide"], "limits": { "calls": 100, "ms": 5000 } },
+      "script": "const n = await page.dom.count('#cookie-banner');\nif (n) await page.dom.hide('#cookie-banner');",
+      "created": "2026-10-25T10:00:00Z",
+      "updated": "2026-10-25T10:00:00Z"
+    }
+  ]
+}</pre>
+
+<h2 id="limits">What it does not do yet</h2>
+<ul>
+  <li>Run a saved fix without the playground open, at page load, on a granted site. <span class="status status-spec">specified</span></li>
+  <li>Insert markup, call a site's own page API, navigate. Each would be a new verb with its own rules. <span class="status status-proposed">proposed</span></li>
+  <li>Stop a script that never yields: the time limit fires between awaits, not inside a tight loop.</li>
+  <li>Sync experiments between machines, or share them anywhere but as a file.</li>
+</ul>
+
+<div class="pagenav">
+  <a href="../title/index.html">&larr; The title fix</a>
+  <a href="../../articles/script-behaviour-policies/index.html">Script Behaviour Policies &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../../install/index.html">Install</a>
+    <a href="../../use/title/index.html">The title fix</a>
+    <a href="../../permissions/index.html">Permissions</a>
+    <a href="../../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../../source/index.html">Source and releases</a>
+    <a href="../../admin/versions.html">Release history</a>
+    <a href="../../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../../assets/version.js"></script>
+</body>
+</html>

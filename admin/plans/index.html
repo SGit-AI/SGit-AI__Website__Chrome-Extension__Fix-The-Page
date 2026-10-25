@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plan: split the extension from the site · Fix the Page</title>
+<meta name="description" content="A plan to move the extension into its own repository with its own releases, keep this site as the page, and start a library of generic and site-specific fixes, each a small application with a policy, tests and a review, open to contributors.">
+<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/admin/plans/index.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/admin/plans/index.html">
+<meta property="og:title" content="Plan: split the extension from the site · Fix the Page">
+<meta property="og:description" content="A plan to move the extension into its own repository with its own releases, keep this site as the page, and start a library of generic and site-specific fixes, each a small application with a policy, tests and a review, open to contributors.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+
+<nav class="site"><div class="row">
+  <a class="brand" href="../../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="../../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <a class="nl" href="../../install/index.html">Install</a>
+  <a class="nl" href="../../use/title/index.html">The title fix</a>
+  <a class="nl" href="../../use/playground/index.html">Playground</a>
+  <a class="nl" href="../../articles/index.html">Articles</a>
+  <a class="nl" href="../../permissions/index.html">Permissions</a>
+  <a class="nl" href="../../privacy/index.html">Privacy</a>
+  <a class="nl" href="../../source/index.html">Source</a>
+  <a class="gh" href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">&#9733; GitHub</a>
+</div></nav>
+
+<main class="doc">
+<div class="crumb"><a href="../../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / admin / plans</div>
+<h1>Plan: split the extension from the site, and start a library of fixes</h1>
+<p class="small dim">Written 25 October 2026 by this site's agent, from Dinis Cruz's memo of the same day. A proposal for Dinis to accept, change or refuse; nothing here is started without his word. <a href="2026-10-25-split-and-fixes.md">markdown</a>.</p>
+<p class="lead">Three repositories where there is one: the extension, with its own tests, releases and version; this site, which is the page and publishes the releases and the articles; and a library of fixes, generic and site-specific, each a small application with a policy, tests and a review, that a community can contribute to.</p>
+
+<h2 id="why">Why split</h2>
+<ul>
+  <li><b>The website is the web page.</b> It changes when the words change. The extension changes when the code changes. Today one version number covers both, which was right for a first release and will be wrong by the third.</li>
+  <li><b>The extension wants its own releases.</b> A GitHub release per tag, with the zip and its hash as assets, is what a reader and a store expect. Today the zip is committed into the site.</li>
+  <li><b>Fixes are a third thing.</b> They are data plus a small script under a policy, contributed by people who need not touch the extension, reviewed by a process of their own, and consumed by the extension as packs. They do not belong in either repository above.</li>
+</ul>
+
+<h2 id="repos">The three repositories</h2>
+<div class="tablewrap"><table>
+  <thead><tr><th>Repository</th><th>Holds</th><th>Releases</th><th>Version</th></tr></thead>
+  <tbody>
+    <tr><td><code>SGit-AI/SGit-AI__Chrome-Extension__Fix-The-Page</code> <span class="status status-proposed">proposed</span></td><td><code>extension/</code>, <code>tests/</code>, the packaging and the extension half of the validator, the debriefs about the code</td><td>a GitHub release per tag with <code>fix-the-page-vX.Y.Z.zip</code> and <code>.sha256</code>; later the Web Store</td><td>its own, in <code>manifest.json</code></td></tr>
+    <tr><td><code>SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page</code> (this one)</td><td>the site: install, use, permissions, privacy, articles, plans; a copy of each release's zip and hash, fetched from the extension's release, so the site stays static and a reader can still download from here</td><td>every push to <code>dev</code>, as now</td><td>its own; each page states which extension release it describes</td></tr>
+    <tr><td><code>SGit-AI/SGit-AI__Fixes__Fix-The-Page</code> <span class="status status-proposed">proposed</span></td><td>one folder per fix: <code>fix.json</code>, <code>fix.js</code>, <code>README.md</code>, <code>tests/</code>, <code>REVIEW.md</code>; the review skill; CI</td><td>packs: a signed JSON file per site or per theme, which the extension imports</td><td>per fix, in <code>fix.json</code></td></tr>
+  </tbody>
+</table></div>
+<div class="note"><b>On the name.</b> The memo said "something like sgit-ai, chrome-extensions, and then fix the page". The family's pattern is <code>Owner__Kind__Name</code> (<code>SGit-AI__Website__Chrome-Extensions</code> is the hub, <code>SGit-AI__Website__Game__What-Can-It-Do</code> a game). <code>SGit-AI__Chrome-Extension__Fix-The-Page</code> follows it with <code>Chrome-Extension</code> as the kind. If there will be several extensions, <code>SGit-AI__Chrome-Extensions__Fix-The-Page</code> reads better as a family. Dinis's call.</div>
+
+<h2 id="steps">The steps, in order</h2>
+<ol class="steps">
+  <li><h3>Create the extension repository with its history</h3><p><code>git filter-repo --path extension/ --path tests/ --path admin/build/package.mjs --path admin/build/zip.js --path admin/build/icons.mjs</code> on a fresh clone keeps every commit that touched those paths. The validator's extension checks move with it as <code>scripts/validate.js</code>; the site checks stay here. One commit, no code change.</p></li>
+  <li><h3>Give it its own pipeline</h3><p>On every push: validate, test (Playwright, as now). On a tag <code>vX.Y.Z</code>: build the zip, hash it, create the GitHub release with both as assets. The tag job from the hub's pipeline applies unchanged; the deploy job goes.</p></li>
+  <li><h3>Teach this site to serve a release it did not build</h3><p>A small script, <code>admin/build/fetch-release.mjs &lt;version&gt;</code>, downloads the zip and the hash from the extension's release, verifies the hash, and writes them into <code>releases/</code> with a <code>releases/current.json</code> naming the version. The validator checks the hash against the file and the site's pages against <code>current.json</code> instead of against <code>extension/</code>. The install page says "extension vX.Y.Z, site vA.B.C".</p></li>
+  <li><h3>Remove <code>extension/</code> and <code>tests/</code> from this repository</h3><p>After the extension repository has had one green release and this site has served it. The README here points at the extension repository; the source page lists its files by link.</p></li>
+  <li><h3>Start the fixes repository with the examples</h3><p>The seven playground examples become the first seven fixes, in the folder shape below, with tests on the fixtures already written. The README template, the review template and the CI are written once and copied.</p></li>
+  <li><h3>Teach the extension to import a pack</h3><p>A pack is <code>{ format: "fix-the-page/pack", version, name, fixes: [experiments...] }</code>, the experiments export with a name and, later, a signature. Import shows every fix and its policy before anything is kept. Then: run kept fixes at load on granted sites, under their policies, which needs the sandbox to run without the playground open (an offscreen document, or the sandbox hosted by the options page while it is open; to be designed and measured).</p></li>
+  <li><h3>Ask the hub to link to both</h3><p>The hub is read-only to this agent; the request goes to Dinis or to the hub's agent.</p></li>
+</ol>
+
+<h2 id="fixes">Generic fixes and site-specific fixes</h2>
+<p>The same shape, told apart by <code>match</code>, and by what they are allowed to assume:</p>
+<div class="tablewrap"><table>
+  <thead><tr><th></th><th>Generic</th><th>Site-specific</th></tr></thead>
+  <tbody>
+    <tr><td>Match</td><td><code>*://*/*</code> or <code>https://*/*</code></td><td>one origin, or a path under it</td></tr>
+    <tr><td>Folder</td><td><code>fixes/generic/&lt;slug&gt;/</code></td><td><code>fixes/&lt;host&gt;/&lt;slug&gt;/</code></td></tr>
+    <tr><td>May assume</td><td>only the platform: CSS, the title, headings</td><td>the site's markup, named selectors; a site's own page API where it has one</td></tr>
+    <tr><td>Honesty label</td><td>"best effort" where it guesses, as the newsroom's generic reading mode does</td><td>"as of" a date, because markup changes; the test fixture is a snapshot of the site's markup</td></tr>
+    <tr><td>Capabilities, typically</td><td><code>css.add</code>, <code>title.*</code></td><td><code>dom.count</code>, <code>dom.hide</code>, <code>dom.setText</code>, with a selector allowlist in the policy</td></tr>
+    <tr><td>Examples today</td><td>bigger text; prefix the title with the host; hide sticky bars (best effort)</td><td>hide one element; rename a heading</td></tr>
+  </tbody>
+</table></div>
+<p>A site-specific fix should carry <code>selectors</code> in its policy: the exact selectors it may name. Then a reviewer reads five lines and knows the whole reach of the fix, and the gate refuses any other selector at run time.</p>
+
+<h2 id="library">Every fix a small application</h2>
+<pre class="shell"><span class="cy">fixes/example.com/hide-cookie-banner/</span>
+  fix.json     { "name", "match", "policy": { capabilities, limits, selectors }, "author", "version", "licence", "asOf" }
+  fix.js       the script
+  README.md    what it does, for a reader; must name the same capabilities as the policy
+  tests/
+    page.html  a fixture: the site's markup, trimmed, as of the date in fix.json
+    expect.json  what must be true after the fix runs: hidden selectors, title, text
+  REVIEW.md    reviewer, date, the delta they computed, what they ran; later a signature</pre>
+<p>CI on a pull request: the lint (calls ⊆ policy, no banned names, no unused grants); the tests under the sandbox harness in <code>tests/fixtures/sandbox-host.html</code>; README names ⊆ policy and policy ⊆ README names; <code>fix.json</code> validates as an experiment. A reviewing agent gets a skill that says: read the three files, compute the delta both ways, run the tests, write <code>REVIEW.md</code>. Human review stays for anything site-specific that names a selector on a page with money or data behind it. The barrier on the repository is a boundary; the barrier on the running fix is the runtime's and does not depend on the review having been right.</p>
+
+<h2 id="community">Opening it up</h2>
+<ul>
+  <li><b>Contribution is a pull request with one folder.</b> The template repository gives the shape; CI gives the first review; a maintainer merges.</li>
+  <li><b>Packs are the unit of distribution.</b> A pack per site ("example.com, 4 fixes") or per theme ("reading, 3 fixes"), built by CI from merged fixes, published as a release of the fixes repository and, when the vault route is ready, from an sgit vault with a read key.</li>
+  <li><b>Signing comes from pki.sgit.ai.</b> A maintainer key signs each pack; an author key may sign each fix. The extension shows who signed, and refuses a pack changed after signing. <span class="status status-proposed">proposed</span></li>
+  <li><b>Kept fixes are the roadmap.</b> The original article's argument: the fixes people keep are the best brief a site will get. A count of kept fixes, in the reader's own record and sent only if they choose, would tell site owners which primitives to publish.</li>
+</ul>
+
+<h2 id="decisions">Decisions for Dinis</h2>
+<ol>
+  <li>The names of the two new repositories (see the note above).</li>
+  <li>Whether this site keeps serving the zip (recommended: yes, fetched and verified from the extension's release) or links to the GitHub release only.</li>
+  <li>Whether saved fixes should ever run without the playground open, and if so on which barrier: granted sites only, under their policies, with the same Undo.</li>
+  <li>Whether <code>selectors</code> should be required in the policy of every site-specific fix (recommended: yes).</li>
+  <li>The licence for contributed fixes (the family's default is Apache 2.0 for code, CC BY 4.0 for words).</li>
+</ol>
+
+<div class="pagenav">
+  <a href="../index.html">&larr; How this site is built</a>
+  <a href="../../articles/script-behaviour-policies/index.html">Script Behaviour Policies &rarr;</a>
+</div>
+</main>
+
+
+<footer class="site"><div class="cols">
+  <div>
+    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
+    <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
+    <p class="verline">site and extension <a href="../../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a></p>
+  </div>
+  <div>
+    <h4>The extension</h4>
+    <a href="../../install/index.html">Install</a>
+    <a href="../../use/title/index.html">The title fix</a>
+    <a href="../../permissions/index.html">Permissions</a>
+    <a href="../../privacy/index.html">Privacy</a>
+  </div>
+  <div>
+    <h4>Source</h4>
+    <a href="../../source/index.html">Source and releases</a>
+    <a href="../../admin/versions.html">Release history</a>
+    <a href="../../admin/index.html">How this site is built</a>
+    <a href="https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page">GitHub</a>
+  </div>
+  <div>
+    <h4>Family</h4>
+    <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a>
+    <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">The newsroom article</a>
+    <a href="https://sgit.ai">sgit.ai</a>
+    <a href="../../llms.txt">llms.txt</a>
+  </div>
+</div></footer>
+<script src="../../assets/version.js"></script>
+</body>
+</html>

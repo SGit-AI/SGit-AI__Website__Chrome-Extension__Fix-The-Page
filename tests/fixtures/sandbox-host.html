@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Sandbox host</title></head>
+<body>
+<h1>A page that hosts the sandbox, for the tests</h1>
+<iframe id="sandbox" src="/ext/sandbox.html" sandbox="allow-scripts"></iframe>
+<script>
+  // A tiny stand-in for the playground: runs a script in the sandbox, answers capability calls from a
+  // table the test supplies, records everything.
+  window.events = [];
+  window.ready = new Promise(function (resolve) {
+    window.addEventListener('message', function (ev) {
+      if (ev.source !== document.getElementById('sandbox').contentWindow) { window.events.push({ foreign: true, data: ev.data }); return; }
+      var msg = ev.data;
+      window.events.push(msg);
+      if (msg.type === 'sbp:ready') resolve();
+      if (msg.type === 'sbp:cap') {
+        var answer = (window.answers && window.answers[msg.name]) || { ok: false, error: 'no answer configured' };
+        ev.source.postMessage({ type: 'sbp:cap-result', id: msg.id, ok: answer.ok, value: answer.value, error: answer.error }, '*');
+      }
+      if (msg.type === 'sbp:done') window.lastDone = msg;
+    });
+  });
+  window.runScript = function (script, capabilities, limits, answers) {
+    window.answers = answers || {};
+    window.lastDone = null;
+    document.getElementById('sandbox').contentWindow.postMessage({ type: 'sbp:run', runId: 't1', script: script, capabilities: capabilities || [], limits: limits || { calls: 100, ms: 3000 } }, '*');
+    return new Promise(function (resolve) { (function poll() { if (window.lastDone) resolve(window.lastDone); else setTimeout(poll, 20); })(); });
+  };
+</script>
+</body></html>

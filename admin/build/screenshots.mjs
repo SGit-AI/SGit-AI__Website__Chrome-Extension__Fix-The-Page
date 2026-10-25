@@ -48,6 +48,19 @@ await opts.waitForSelector('.rule');
 await opts.waitForSelector('ul.sites li');
 await opts.screenshot({ path: path.join(OUT, 'options.png'), fullPage: true });
 
+// the playground, mid-experiment
+const pgTab = await context.newPage();
+await pgTab.goto(server.base + '/static.html');
+const pgTabId = await sw.evaluate((url) => chrome.tabs.query({ url }).then((t) => t[t.length - 1].id), server.base + '/static.html');
+const pg = await context.newPage();
+await pg.setViewportSize({ width: 1180, height: 1100 });
+await pg.goto(`chrome-extension://${extId}/playground.html?tabId=${pgTabId}`);
+await pg.waitForSelector('#page:not([hidden])');
+await pg.evaluate(() => window.ftpPlayground.fillForm({ name: 'Hide the heading, rename the title', match: 'http://127.0.0.1/*', script: "const n = await page.dom.count('h1');\nlog('headings:', n);\nawait page.dom.hide('h1');\nawait page.title.set('Fixed by a script');", policy: { capabilities: ['dom.count', 'dom.hide', 'title.set'], limits: { calls: 100, ms: 5000 } } }));
+await pg.evaluate(() => window.ftpPlayground.startRun());
+await pg.waitForFunction(() => window.ftpPlayground.log().some((l) => /^done in/.test(l)), null, { timeout: 8000 });
+await pg.screenshot({ path: path.join(OUT, 'playground.png'), fullPage: true });
+
 await context.close(); await server.close();
 fs.rmSync(profile, { recursive: true, force: true });
 

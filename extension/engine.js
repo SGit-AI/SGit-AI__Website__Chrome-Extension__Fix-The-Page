@@ -17,7 +17,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '0.1.0';
+  var VERSION = '0.2.0';
 
   /* ------------------------------------------------------------------ core */
 
@@ -378,12 +378,126 @@
     };
   }
 
+  /* ------------------------------------------------------- capabilities */
+
+  // The verbs a playground script may ask for, each reversible. The policy gate lives in the playground
+  // (a different realm from the script); this side checks the arguments again and keeps an effects log per
+  // run so Undo can reverse exactly what a run did, in reverse order.
+  E.runs = {};
+  var CAP_MAX = { selector: 500, string: 20000, text: 2000, elements: 200 };
+
+  function removeEphemeral(id) {
+    E.ephemeral = E.ephemeral.filter(function (r) { return r.id !== id; });
+    refresh();
+  }
+
+  function selectorArg(s) {
+    if (typeof s !== 'string' || !s.trim() || s.length > CAP_MAX.selector) throw new Error('a selector must be a short, non-empty string');
+    try { document.querySelector(s); } catch (e) { throw new Error('not a valid CSS selector: ' + s); }
+    return s;
+  }
+  function stringArg(s, max) {
+    if (typeof s !== 'string') throw new Error('expected a string');
+    if (s.length > (max || CAP_MAX.string)) throw new Error('string longer than ' + (max || CAP_MAX.string));
+    return s;
+  }
+
+  function capability(runId, name, args) {
+    runId = String(runId || 'run');
+    args = Array.isArray(args) ? args : [];
+    var effects = E.runs[runId] || (E.runs[runId] = []);
+    var els, el, i;
+    switch (name) {
+      case 'title.get': return document.title;
+      case 'url.get': return location.href;
+      case 'title.set': {
+        var value = stringArg(args[0]);
+        var id = 'cap:' + runId + ':title';
+        var r = { id: id, match: core.patternForUrl(location.href) || 'https://*/*', fix: 'title', value: value, mode: 'set', created: new Date().toISOString(), enabled: true };
+        var res = apply(r);
+        if (!res.ok) throw new Error(res.errors.join('; '));
+        if (!effects.some(function (e) { return e.kind === 'title'; })) effects.push({ kind: 'title', ruleId: id });
+        return value;
+      }
+      case 'dom.count': return document.querySelectorAll(selectorArg(args[0])).length;
+      case 'dom.text': {
+        el = document.querySelector(selectorArg(args[0]));
+        return el ? String(el.textContent || '').slice(0, CAP_MAX.text) : null;
+      }
+      case 'dom.hide': {
+        els = Array.prototype.slice.call(document.querySelectorAll(selectorArg(args[0])), 0, CAP_MAX.elements);
+        for (i = 0; i < els.length; i++) {
+          effects.push({ kind: 'hide', el: els[i], prev: els[i].style.getPropertyValue('display'), prio: els[i].style.getPropertyPriority('display') });
+          els[i].style.setProperty('display', 'none', 'important');
+        }
+        return els.length;
+      }
+      case 'dom.setText': {
+        el = document.querySelector(selectorArg(args[0]));
+        if (!el) return 0;
+        effects.push({ kind: 'text', el: el, prev: el.textContent });
+        el.textContent = stringArg(args[1]);
+        return 1;
+      }
+      case 'css.add': {
+        var style = document.createElement('style');
+        style.setAttribute('data-fix-the-page', runId);
+        style.textContent = stringArg(args[0]);
+        (document.head || document.documentElement).appendChild(style);
+        effects.push({ kind: 'css', el: style });
+        return style.getAttribute('data-fix-the-page');
+      }
+      default: throw new Error('no such capability: ' + name);
+    }
+  }
+
+  function undoRun(runId) {
+    var effects = E.runs[String(runId)] || [];
+    for (var i = effects.length - 1; i >= 0; i--) {
+      var e = effects[i];
+      try {
+        if (e.kind === 'title') removeEphemeral(e.ruleId);
+        else if (e.kind === 'hide') { if (e.prev) e.el.style.setProperty('display', e.prev, e.prio || ''); else e.el.style.removeProperty('display'); }
+        else if (e.kind === 'text') e.el.textContent = e.prev;
+        else if (e.kind === 'css') e.el.remove();
+      } catch (err) { /* the element may be gone; nothing to restore */ }
+    }
+    delete E.runs[String(runId)];
+    return Object.keys(E.runs).length;
+  }
+
+  function undoAllRuns() { Object.keys(E.runs).forEach(undoRun); return 0; }
+
+  function runEffects(runId) {
+    return (E.runs[String(runId)] || []).map(function (e) {
+      if (e.kind === 'title') return { kind: 'title', value: E.lastSet };
+      if (e.kind === 'hide') return { kind: 'hide', element: describe(e.el) };
+      if (e.kind === 'text') return { kind: 'text', element: describe(e.el), before: String(e.prev).slice(0, 80) };
+      return { kind: 'css', bytes: e.el.textContent.length };
+    });
+  }
+  function describe(el) {
+    var s = el.tagName.toLowerCase();
+    if (el.id) s += '#' + el.id;
+    else if (el.classList && el.classList.length) s += '.' + Array.prototype.slice.call(el.classList, 0, 3).join('.');
+    return s;
+  }
+
+  function cap(runId, name, args) {
+    try { return { ok: true, value: capability(runId, name, args) }; }
+    catch (e) { return { ok: false, error: String(e && e.message || e) }; }
+  }
+
   E.refresh = refresh;
   E.setStored = setStored;
   E.apply = apply;
   E.undo = undo;
   E.status = status;
   E.siteApi = siteApi;
+  E.cap = cap;
+  E.undoRun = undoRun;
+  E.undoAllRuns = undoAllRuns;
+  E.runEffects = runEffects;
   root.__fixThePage = E;
 
   var api = siteApi();
@@ -404,6 +518,9 @@
         else if (msg.type === 'ftp:apply') sendResponse(apply(msg.rule));
         else if (msg.type === 'ftp:undo') sendResponse(undo());
         else if (msg.type === 'ftp:resume') { E.paused = false; refresh(); sendResponse(status()); }
+        else if (msg.type === 'ftp:cap') sendResponse(cap(msg.runId, msg.name, msg.args));
+        else if (msg.type === 'ftp:cap-undo') sendResponse({ ok: true, runs: msg.runId ? undoRun(msg.runId) : undoAllRuns() });
+        else if (msg.type === 'ftp:cap-effects') sendResponse({ ok: true, effects: runEffects(msg.runId), runs: Object.keys(E.runs) });
       });
     } catch (e) { /* the extension was reloaded under this page; nothing to do */ }
   }

@@ -158,3 +158,154 @@ describe('engine in a page', () => {
     await plain.close();
   });
 });
+
+describe('capabilities in a page (the engine side of the playground)', () => {
+  const cap = (page, runId, name, args) => page.evaluate(([r, n, a]) => window.__fixThePage.cap(r, n, a), [runId, name, args]);
+
+  test('read capabilities read, and nothing changes', async () => {
+    const page = await open('static.html');
+    assert.deepEqual(await cap(page, 'r1', 'title.get', []), { ok: true, value: 'Original' });
+    assert.equal((await cap(page, 'r1', 'url.get', [])).value, server.base + '/static.html');
+    assert.deepEqual(await cap(page, 'r1', 'dom.count', ['h1']), { ok: true, value: 1 });
+    assert.deepEqual(await cap(page, 'r1', 'dom.text', ['h1']), { ok: true, value: 'A static page' });
+    assert.deepEqual(await cap(page, 'r1', 'dom.text', ['nope']), { ok: true, value: null });
+    assert.equal(await page.title(), 'Original');
+    await page.close();
+  });
+
+  test('write capabilities apply and undo reverses them in order', async () => {
+    const page = await open('static.html');
+    assert.deepEqual(await cap(page, 'r2', 'title.set', ['From a script']), { ok: true, value: 'From a script' });
+    assert.equal(await page.title(), 'From a script');
+    assert.deepEqual(await cap(page, 'r2', 'dom.hide', ['h1']), { ok: true, value: 1 });
+    assert.equal(await page.locator('h1').isHidden(), true);
+    assert.deepEqual(await cap(page, 'r2', 'dom.setText', ['p', 'Changed']), { ok: true, value: 1 });
+    assert.equal(await page.locator('p').innerText(), 'Changed');
+    const css = await cap(page, 'r2', 'css.add', ['body { background: rgb(1, 2, 3) !important }']);
+    assert.equal(css.ok, true);
+    assert.equal(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(1, 2, 3)');
+    const effects = await page.evaluate(() => window.__fixThePage.runEffects('r2'));
+    assert.deepEqual(effects.map((e) => e.kind), ['title', 'hide', 'text', 'css']);
+    await page.evaluate(() => window.__fixThePage.undoRun('r2'));
+    assert.equal(await page.title(), 'Original');
+    assert.equal(await page.locator('h1').isVisible(), true);
+    assert.match(await page.locator('p').innerText(), /^Its title is/);
+    assert.notEqual(await page.evaluate(() => getComputedStyle(document.body).backgroundColor), 'rgb(1, 2, 3)');
+    assert.deepEqual(await page.evaluate(() => window.__fixThePage.runEffects('r2')), []);
+    await page.close();
+  });
+
+  test('a title set by a script is held against the page rewriting it', async () => {
+    const page = await open('rewriter.html');
+    await cap(page, 'r3', 'title.set', ['Held']);
+    await page.waitForTimeout(1200);
+    assert.equal(await page.title(), 'Held');
+    await page.evaluate(() => window.__fixThePage.undoRun('r3'));
+    await page.waitForTimeout(700);
+    assert.match(await page.title(), /^Rewritten/);
+    await page.close();
+  });
+
+  test('two runs undo independently, and undoAllRuns clears the rest', async () => {
+    const page = await open('static.html');
+    await cap(page, 'a', 'dom.hide', ['h1']);
+    await cap(page, 'b', 'dom.hide', ['p']);
+    await page.evaluate(() => window.__fixThePage.undoRun('a'));
+    assert.equal(await page.locator('h1').isVisible(), true);
+    assert.equal(await page.locator('p').isHidden(), true);
+    await page.evaluate(() => window.__fixThePage.undoAllRuns());
+    assert.equal(await page.locator('p').isVisible(), true);
+    await page.close();
+  });
+
+  test('the engine refuses what it does not know and bad arguments, whatever the caller says', async () => {
+    const page = await open('static.html');
+    assert.match((await cap(page, 'r4', 'dom.eval', ['x'])).error, /no such capability/);
+    assert.match((await cap(page, 'r4', 'dom.hide', ['%%%'])).error, /not a valid CSS selector/);
+    assert.match((await cap(page, 'r4', 'dom.hide', [''])).error, /selector/);
+    assert.match((await cap(page, 'r4', 'title.set', [42])).error, /string/);
+    assert.match((await cap(page, 'r4', 'css.add', ['x'.repeat(20001)])).error, /longer/);
+    assert.equal(await page.title(), 'Original');
+    await page.close();
+  });
+});
+
+describe('the sandbox realm (sandbox.html as a plain page under its CSP)', () => {
+  async function host() {
+    const page = await browser.newPage();
+    await page.goto(server.base + '/sandbox-host.html');
+    await page.evaluate(() => window.ready);
+    return page;
+  }
+  const runIn = (page, script, caps, limits, answers) => page.evaluate(([s, c, l, a]) => window.runScript(s, c, l, a), [script, caps || [], limits || null, answers || {}]);
+
+  test('a script sees no window, document, fetch, chrome or parent', async () => {
+    const page = await host();
+    const done = await runIn(page, "return [typeof window, typeof document, typeof fetch, typeof chrome, typeof parent, typeof globalThis, typeof localStorage, typeof XMLHttpRequest].join(',');");
+    assert.equal(done.ok, true);
+    assert.equal(done.value, 'undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined');
+    await page.close();
+  });
+
+  test('a granted capability call reaches the host and the answer comes back', async () => {
+    const page = await host();
+    const done = await runIn(page, "const t = await page.title.get(); await page.title.set('[x] ' + t); return t;", ['title.get', 'title.set'], null, { 'title.get': { ok: true, value: 'Original' }, 'title.set': { ok: true, value: '[x] Original' } });
+    assert.equal(done.ok, true);
+    assert.equal(done.value, 'Original');
+    const calls = await page.evaluate(() => window.events.filter((e) => e.type === 'sbp:cap').map((e) => [e.name, e.args]));
+    assert.deepEqual(calls, [['title.get', []], ['title.set', ['[x] Original']]]);
+    await page.close();
+  });
+
+  test('a capability not in the policy is refused before any message is sent', async () => {
+    const page = await host();
+    const done = await runIn(page, "await page.css.add('body{display:none}');", ['title.set']);
+    assert.equal(done.ok, false);
+    assert.match(done.error, /not in the policy/);
+    assert.equal(await page.evaluate(() => window.events.filter((e) => e.type === 'sbp:cap').length), 0);
+    await page.close();
+  });
+
+  test('the host refusing a call surfaces as an error in the script', async () => {
+    const page = await host();
+    const done = await runIn(page, "try { await page.dom.hide('body'); return 'applied'; } catch (e) { return 'caught: ' + e.message; }", ['dom.hide'], null, { 'dom.hide': { ok: false, error: 'refused by the policy: selector "body" is not in the policy' } });
+    assert.equal(done.value, 'caught: refused by the policy: selector "body" is not in the policy');
+    await page.close();
+  });
+
+  test('a script that runs too long is stopped by the time limit', async () => {
+    const page = await host();
+    const done = await runIn(page, "await new Promise(() => {});", [], { calls: 10, ms: 300 });
+    assert.equal(done.ok, false);
+    assert.match(done.error, /longer than 300 ms/);
+    await page.close();
+  });
+
+  test('a script that calls too often is stopped by the call limit', async () => {
+    const page = await host();
+    const done = await runIn(page, "for (let i = 0; i < 20; i++) await page.title.get();", ['title.get'], { calls: 5, ms: 3000 }, { 'title.get': { ok: true, value: 'x' } });
+    assert.equal(done.ok, false);
+    assert.match(done.error, /more than 5 calls/);
+    await page.close();
+  });
+
+  test('a syntax error and a thrown error are reported, not swallowed', async () => {
+    const page = await host();
+    assert.match((await runIn(page, "await (", [])).error, /syntax/);
+    assert.match((await runIn(page, "throw new Error('mine')", [])).error, /mine/);
+    await page.close();
+  });
+
+  test('the sandbox cannot open a connection (CSP), and an escape from the shadowing still only yields messages', async () => {
+    const page = await host();
+    // (async () => {}).constructor reaches the real AsyncFunction and, through it, the sandbox's own window; what it finds
+    // there is a page with no network and no extension API. The only way out is still a message.
+    const done = await runIn(page, "const F = (async () => {}).constructor; const w = await F('return globalThis')(); let f = 'none'; try { await w.fetch('http://127.0.0.1:1/'); f = 'fetched'; } catch (e) { f = 'blocked: ' + e.name; } return [typeof w.chrome, typeof w.document.querySelector, f].join('|');", []);
+    assert.equal(done.ok, true);
+    const [chrome, qs, fetched] = done.value.split('|');
+    assert.equal(chrome, 'undefined');
+    assert.equal(qs, 'function');
+    assert.match(fetched, /^blocked/);
+    await page.close();
+  });
+});

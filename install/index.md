@@ -15,7 +15,7 @@ To update: `git pull`, then the reload arrow on the extension's card.
 
 ## Route B: from the release zip
 
-1. Download [fix-the-page-v0.1.0.zip](../releases/fix-the-page-v0.1.0.zip) and [its SHA-256](../releases/fix-the-page-v0.1.0.zip.sha256). Check with `shasum -a 256 fix-the-page-v0.1.0.zip` against the hash on the [source page](../source/index.md).
+1. Download [fix-the-page-v0.2.0.zip](../releases/fix-the-page-v0.2.0.zip) and [its SHA-256](../releases/fix-the-page-v0.2.0.zip.sha256). Check with `shasum -a 256 fix-the-page-v0.2.0.zip` against the hash on the [source page](../source/index.md).
 2. Unzip into a folder you will keep.
 3. `chrome://extensions`, Developer mode.
 4. Load unpacked, and pick the unzipped folder (the one with `manifest.json`).

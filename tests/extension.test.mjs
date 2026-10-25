@@ -263,3 +263,105 @@ describe('extension in Chromium', () => {
     await sw.evaluate(() => globalThis.ftp.removeSite('http://127.0.0.1/*'));
   });
 });
+
+describe('the playground', () => {
+  const playgroundFor = async (page) => {
+    const id = await tabIdFor(page.url());
+    const pg = await context.newPage();
+    await pg.goto(`chrome-extension://${extId}/playground.html?tabId=${id}`);
+    await pg.waitForSelector('#page:not([hidden])');
+    await pg.waitForFunction(() => document.getElementById('run') && !document.getElementById('run').disabled || document.getElementById('lint').textContent.length > 0);
+    return pg;
+  };
+  const setForm = (pg, x) => pg.evaluate((x) => window.ftpPlayground.fillForm(x), x);
+  const runAndWait = async (pg) => {
+    await pg.evaluate(() => window.ftpPlayground.startRun());
+    await pg.waitForFunction(() => window.ftpPlayground.log().some((l) => /^(done in|ended with an error)/.test(l)), null, { timeout: 8000 });
+    return pg.evaluate(() => window.ftpPlayground.log());
+  };
+
+  test('opened on its own, it says so and still offers the editor', async () => {
+    const pg = await context.newPage();
+    await pg.goto(`chrome-extension://${extId}/playground.html`);
+    await pg.waitForSelector('#restricted:not([hidden])');
+    assert.equal(await pg.locator('#run').isDisabled(), true);
+    assert.ok((await pg.locator('#caps input.cap').count()) >= 8);
+    await pg.close();
+  });
+
+  test('a script under a matching policy runs, changes the tab, and undo reverses it', async () => {
+    await setRules([]);
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const pg = await playgroundFor(page);
+    await setForm(pg, { name: 'Lab', match: server.base + '/*', script: "await page.title.set('From the lab');\nconst n = await page.dom.hide('h1');\nlog('hid', n);", policy: { capabilities: ['title.set', 'dom.hide'], limits: { calls: 100, ms: 5000 } } });
+    assert.match(await pg.locator('#lint').innerText(), /grants exactly that/);
+    const log = await runAndWait(pg);
+    assert.ok(log.some((l) => /^done in/.test(l)), log.join('\n'));
+    assert.ok(log.some((l) => l === 'log: hid 1'), log.join('\n'));
+    assert.equal(await page.title(), 'From the lab');
+    assert.equal(await page.locator('h1').isHidden(), true);
+    await pg.click('#undo');
+    await pg.waitForFunction(() => document.getElementById('message').textContent.includes('Undid'));
+    assert.equal(await page.title(), 'Original');
+    assert.equal(await page.locator('h1').isVisible(), true);
+    await pg.close(); await page.close();
+  });
+
+  test('a call outside the policy is refused by the static review, and by the gate if it gets past it', async () => {
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const pg = await playgroundFor(page);
+    await setForm(pg, { name: 'Over-reach', match: server.base + '/*', script: "await page.css.add('body { display: none !important }');", policy: { capabilities: ['title.set'], limits: { calls: 100, ms: 5000 } } });
+    assert.match(await pg.locator('#lint').innerText(), /does not grant it/);
+    assert.equal(await pg.locator('#run').isDisabled(), true);
+    await pg.evaluate(() => window.ftpPlayground.startRun());
+    assert.match(await pg.locator('#message').innerText(), /Not run/);
+    assert.equal(await page.locator('h1').isVisible(), true);
+    // a forged message from anywhere but the sandbox is ignored
+    await pg.evaluate(() => window.postMessage({ type: 'sbp:cap', runId: 'r1', id: 'c1', name: 'css.add', args: ['body { display: none !important }'] }, '*'));
+    await pg.waitForTimeout(300);
+    assert.equal(await page.locator('h1').isVisible(), true);
+    await pg.close(); await page.close();
+  });
+
+  test('a banned word blocks the run, and the lint names the line', async () => {
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const pg = await playgroundFor(page);
+    await setForm(pg, { name: 'Sneaky', match: server.base + '/*', script: "const d = document;\nawait page.title.set('x');", policy: { capabilities: ['title.set'], limits: { calls: 100, ms: 5000 } } });
+    assert.match(await pg.locator('#lint').innerText(), /line 1: "document"/);
+    assert.equal(await pg.locator('#run').isDisabled(), true);
+    await pg.close(); await page.close();
+  });
+
+  test('save, list, export, import and delete experiments', async () => {
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const pg = await playgroundFor(page);
+    await setForm(pg, { name: 'Keep me', match: server.base + '/*', script: "await page.title.set('Kept');", policy: { capabilities: ['title.set'], limits: { calls: 100, ms: 5000 } } });
+    await pg.click('#save');
+    await pg.waitForFunction(() => document.getElementById('message').textContent.includes('Saved'));
+    const list = await pg.evaluate(() => window.ftpPlayground.loadExperiments());
+    assert.equal(list.length, 1);
+    assert.equal(list[0].name, 'Keep me');
+    assert.deepEqual(list[0].policy.capabilities, ['title.set']);
+    assert.equal(await pg.locator('.experiment .x-scope').textContent(), 'site-specific');
+    const [download] = await Promise.all([pg.waitForEvent('download'), pg.click('#export')]);
+    const exported = fs.readFileSync(await download.path(), 'utf8');
+    assert.equal(JSON.parse(exported).format, 'fix-the-page/experiments');
+    pg.on('dialog', (d) => d.accept());
+    await pg.click('.experiment .x-delete');
+    await pg.waitForSelector('#experiments-empty:not([hidden])');
+    const tmp = path.join(profile, 'experiments.json');
+    fs.writeFileSync(tmp, exported);
+    await pg.setInputFiles('#import-file', tmp);
+    await pg.waitForFunction(() => document.getElementById('side-message').textContent.includes('Imported 1'));
+    assert.equal((await pg.evaluate(() => window.ftpPlayground.loadExperiments())).length, 1);
+    fs.writeFileSync(tmp, JSON.stringify({ format: 'fix-the-page/experiments', version: 1, experiments: [{ ...JSON.parse(exported).experiments[0], script: "document.cookie", policy: { policy: 'fix-the-page/sbp', version: 1, capabilities: ['dom.eval'] } }] }));
+    await pg.setInputFiles('#import-file', tmp);
+    await pg.waitForFunction(() => document.getElementById('side-message').textContent.includes('Not imported'));
+    assert.equal((await pg.evaluate(() => window.ftpPlayground.loadExperiments())).length, 1);
+    await pg.close(); await page.close();
+  });
+});

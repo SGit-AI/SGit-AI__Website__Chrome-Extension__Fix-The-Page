@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Fix the Page",
-  "version": "0.1.0",
-  "description": "Fix the page you are on, only when you ask: starting with the tab's title. No network, no telemetry.",
+  "version": "0.2.0",
+  "description": "Fix the page you are on, only when you ask: the tab's title, and a playground for your own fixes under a policy. No network, no telemetry.",
   "homepage_url": "https://fix-the-page.chrome-extensions.sgit.ai/",
   "minimum_chrome_version": "116",
   "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
@@ -13,6 +13,10 @@
   "commands": {
     "_execute_action": { "suggested_key": { "default": "Alt+Shift+T" }, "description": "Fix the Page: set this tab's title" }
   },
-  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'none'" },
+  "sandbox": { "pages": ["sandbox.html"] },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'none'",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-eval'; object-src 'none'; connect-src 'none'; child-src 'none'; frame-src 'none'; img-src 'none'; media-src 'none'; font-src 'none'; style-src 'none'; form-action 'none'; base-uri 'none'"
+  },
   "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
 }

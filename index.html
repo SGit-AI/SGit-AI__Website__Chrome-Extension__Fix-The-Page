@@ -21,10 +21,12 @@
 <nav class="site"><div class="row">
   <a class="brand" href="index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.1 · the title fix</span>
-  <a class="ver" href="admin/versions.html" title="Release history" data-site-version>v0.1.0</a>
+  <span class="stage-pill">v0.2 · the playground</span>
+  <a class="ver" href="admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
   <a class="nl" href="install/index.html">Install</a>
   <a class="nl" href="use/title/index.html">The title fix</a>
+  <a class="nl" href="use/playground/index.html">Playground</a>
+  <a class="nl" href="articles/index.html">Articles</a>
   <a class="nl" href="permissions/index.html">Permissions</a>
   <a class="nl" href="privacy/index.html">Privacy</a>
   <a class="nl" href="source/index.html">Source</a>
@@ -58,7 +60,17 @@
   </div>
 </section>
 
-<section class="band" id="how">
+<section class="band" id="playground">
+  <h2>New in 0.2: the playground, and a policy for every script</h2>
+  <p class="blurb">Write a small fix as a script, tick what it may do, run it on a page, see exactly what it did, undo it, keep it. The script runs in a sandbox with nothing in it but the capabilities you ticked, and every call is checked against the policy before it reaches the page. A fix that may only set the title cannot do anything else, whatever it says.</p>
+  <div class="cards">
+    <a class="card" href="use/playground/index.html"><span class="tag">Built</span><h3>The playground</h3><p>Eight capabilities, each reversible: read or set the title, read the URL, count, read or replace an element's text, hide elements, add a stylesheet. Saved experiments live in your browser; export them as a file to share.</p><span class="go">How it works &rarr;</span></a>
+    <a class="card" href="articles/script-behaviour-policies/index.html"><span class="tag">Article</span><h3>Script Behaviour Policies</h3><p>The Agent Behaviour Policy model applied to a line of JavaScript: what the script may do (the mandate), what a script on a page can do (the grant), the difference, and where each line is enforced. Static review and runtime enforcement, both.</p><span class="go">Read &rarr;</span></a>
+    <a class="card" href="admin/plans/index.html"><span class="tag">Plan</span><h3>Splitting the extension from the site, and a library of fixes</h3><p>The extension becomes its own repository with its own releases; this site stays the page; a third repository holds generic and site-specific fixes, each a small application with a policy, tests and a review.</p><span class="go">The plan &rarr;</span></a>
+  </div>
+</section>
+
+<section class="band alt" id="how">
   <h2>How a fix reaches a page</h2>
   <p class="blurb">Two routes, and the extension tells you which one it is using.</p>
   <div class="cards">
@@ -67,35 +79,35 @@
   </div>
 </section>
 
-<section class="band alt" id="not">
+<section class="band" id="not">
   <h2>What it does not do</h2>
   <div class="cards">
     <div class="card"><h3>No standing access to the web</h3><p>No <code>host_permissions</code> in the manifest, no <code>&lt;all_urls&gt;</code>, no <code>tabs</code>, <code>history</code>, <code>cookies</code>, <code>webRequest</code> or <code>debugger</code>. The validator rejects a manifest that asks for any of them.</p></div>
-    <div class="card"><h3>No code from anywhere else</h3><p>Fixes are data: a rule names a bundled fix and a value. The bundled engine interprets it. No <code>eval</code>, no <code>new Function</code>, no scripts from the web, nothing executed from an import file.</p></div>
+    <div class="card"><h3>No code from anywhere else</h3><p>Rules are data: a rule names a bundled fix and a value, and the bundled engine interprets it. The playground runs your own scripts, in a sandbox with no network and no page, and only when you press Run. Nothing is fetched, nothing from an import file is executed, and no script runs without you.</p></div>
     <div class="card"><h3>No network, no telemetry</h3><p>The extension's own pages run under a Content Security Policy with <code>connect-src 'none'</code>. The validator refuses any <code>fetch</code>, <code>XMLHttpRequest</code> or <code>WebSocket</code> in the code. Rules live in your browser; export and import go through files you choose.</p></div>
     <div class="card"><h3>Nothing of the page but what the fix needs</h3><p>It reads the URL, to match rules, and the title, to replace it. It never reads form fields, cookies or page text, and never stores them.</p></div>
   </div>
   <p class="blurb" style="margin-top:1.4rem;margin-bottom:0"><a href="privacy/index.html">The privacy page, in full &rarr;</a></p>
 </section>
 
-<section class="band" id="from">
+<section class="band alt" id="from">
   <h2>Where this comes from</h2>
   <p class="blurb">The newsroom article <a href="https://newsroom.sgit.ai/articles/fix-the-page-yourself.html">Fix the page yourself</a> (17 October 2026) argues that the next user experience is the one the user customises, prefers fixes "the reader is the one who clicks" for, and says plainly that its author does not like "one extension with access to every site I visit". This extension reconciles the two: generic in what it can do, narrow in what it may touch at any moment. It is a child of the <a href="https://chrome-extensions.sgit.ai">chrome-extensions.sgit.ai</a> hub and follows its guides, including the one on build provenance: the options page shows the version, the commit and the build time, because "running an old build" is the hub's first silent failure.</p>
   <div class="ratio">
-    <div class="stat"><b>1</b><span>fix shipped: the title</span></div>
-    <div class="stat"><b>4</b><span>permissions, each explained</span></div>
+    <div class="stat"><b>1</b><span>fix shipped as a rule: the title</span></div>
+    <div class="stat"><b>8</b><span>capabilities a script may be granted</span></div>
     <div class="stat"><b>0</b><span>network calls</span></div>
   </div>
 </section>
 
-<section class="band alt" id="next">
-  <h2>After the title</h2>
-  <p class="blurb">A proposed order, none of it started without Dinis's word. Each would be a release of its own.</p>
+<section class="band" id="next">
+  <h2>After the playground</h2>
+  <p class="blurb">A proposed order, none of it started without Dinis's word. Each would be a release of its own. <a href="admin/plans/index.html">The plan</a> has the detail.</p>
   <div class="cards">
-    <div class="card"><span class="tag">Proposed</span><h3>The newsroom's fixes, generically</h3><p>Bigger text, high contrast and text spacing are CSS only, so safe on any site. Outline reads headings. Reading mode guesses, so best-effort. On a site that publishes <code>window.__tools.page</code>, call its fixes by name instead.</p></div>
-    <div class="card"><span class="tag">Proposed</span><h3>Hide an element</h3><p>A rule with a CSS selector. The most common user fix: banners and sticky bars. Selectors are data, and get validated.</p></div>
-    <div class="card"><span class="tag">Proposed</span><h3>Rule packs and signed rules</h3><p>Share a set of rules for a site as a file or from an sgit vault; later, sign them with a key the pki.sgit.ai register vouches for.</p></div>
-    <div class="card"><span class="tag">Out of scope by design</span><h3>Arbitrary user JavaScript</h3><p>That is a userscript manager, which needs Chrome's userScripts API and a developer toggle. It breaks the one rule.</p></div>
+    <div class="card"><span class="tag">Proposed</span><h3>Saved fixes that run on their own</h3><p>An experiment you keep, applied at load on a site you have granted, under its policy, with the same undo. Needs the sandbox to run without the playground open.</p></div>
+    <div class="card"><span class="tag">Proposed</span><h3>The extension in its own repository</h3><p>Its own tests, releases and version; this site stays the page and states which release it serves.</p></div>
+    <div class="card"><span class="tag">Proposed</span><h3>A library of fixes, with contributors</h3><p>One folder per fix: the script, its policy, a README that says the same thing, tests on a fixture page, a review record. Generic fixes and site-specific ones, side by side.</p></div>
+    <div class="card"><span class="tag">Out of scope by design</span><h3>Scripts with the run of the page</h3><p>A userscript manager gives a script everything the page can do. Here a script gets what its policy says, enforced outside its reach, or it does not run.</p></div>
   </div>
   <div style="max-width:960px;margin:1.4rem auto 0;padding:0 1.1rem"><p class="small dim">Status marks on this site: <span class="status status-built">built</span> is in this release and tested; <span class="status status-spec">specified</span> is written down in the brief and not yet built; <span class="status status-proposed">proposed</span> is an idea for Dinis to accept or refuse.</p></div>
 </section>
@@ -106,7 +118,7 @@
     <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="admin/versions.html" data-site-version>v0.1.0</a> · <a href="releases/fix-the-page-v0.1.0.zip">download fix-the-page-v0.1.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+    <p class="verline">site and extension <a href="admin/versions.html" data-site-version>v0.2.0</a> · <a href="releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
   </div>
   <div>
     <h4>The extension</h4>

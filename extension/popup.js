@@ -11,7 +11,7 @@
     restricted: $('restricted'), restrictedWhy: $('restricted-why'), error: $('error'), errorText: $('error-text'), main: $('main'),
     pageTitle: $('page-title'), pageUrl: $('page-url'), siteApi: $('site-api'), applied: $('applied'),
     form: $('form'), value: $('value'), mode: $('mode'), preview: $('preview'), match: $('match'), always: $('always'),
-    apply: $('apply'), undo: $('undo'), message: $('message'), version: $('version'), rulesLink: $('rules-link')
+    apply: $('apply'), undo: $('undo'), message: $('message'), version: $('version'), rulesLink: $('rules-link'), playgroundLink: $('playground-link')
   };
   const manifest = chrome.runtime.getManifest();
   el.version.textContent = 'v' + manifest.version;
@@ -107,6 +107,12 @@
   el.mode.addEventListener('change', preview);
   el.match.addEventListener('input', preview);
   el.rulesLink.addEventListener('click', (ev) => { ev.preventDefault(); chrome.runtime.openOptionsPage(); });
+  // The playground opens for the tab the popup was invoked on; the activeTab grant for that tab is the
+  // extension's, so the playground page can use it as long as the tab stays on this page.
+  el.playgroundLink.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    chrome.tabs.create({ url: chrome.runtime.getURL('playground.html' + (tab && tab.id ? '?tabId=' + tab.id : '')) });
+  });
 
   el.form.addEventListener('submit', async (ev) => {
     ev.preventDefault();

@@ -7,10 +7,10 @@ The whole extension is a dozen small files with no dependencies, and every relea
 ## The current release
 
 - Version: v0.1.0
-- File: [fix-the-page-v0.1.0.zip](../releases/fix-the-page-v0.1.0.zip) · [.sha256](../releases/fix-the-page-v0.1.0.zip.sha256)
-- SHA-256: `c53f64dc12def64e00a66c4d055de39e1c706914823592237e8f32ff99303419`
+- File: [fix-the-page-v0.2.0.zip](../releases/fix-the-page-v0.2.0.zip) · [.sha256](../releases/fix-the-page-v0.2.0.zip.sha256)
+- SHA-256: `402ff0e1c0626136a1e37933ec0cb3a298a775ccf65c79fca5a7310ebca287e0`
 
-Check with `shasum -a 256 fix-the-page-v0.1.0.zip`. The validator refuses a release whose zip differs from `extension/` in any byte or whose hash file does not match.
+Check with `shasum -a 256 fix-the-page-v0.2.0.zip`. The validator refuses a release whose zip differs from `extension/` in any byte or whose hash file does not match.
 
 ## The extension, file by file
 

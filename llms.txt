@@ -2,10 +2,11 @@
 
 > One generic Chrome extension that fixes the page you are on, only when you ask, built on
 > activeTab. It touches a tab only when the user invokes it there, keeps nothing it does not
-> need, and can say exactly what it changed. Version 0.1 ships one fix: the tab's title, in
-> set, prefix, suffix and template modes, on demand or persistently per site.
+> need, and can say exactly what it changed. Version 0.2 ships the title fix (set, prefix,
+> suffix, template; on demand or persistently per site) and a playground where a fix is written
+> as a script under a Script Behaviour Policy, run in a sandbox, and undone.
 
-Site and extension version: v0.1.0 (24 October 2026). A child of the hub
+Site and extension version: v0.2.0 (25 October 2026). A child of the hub
 chrome-extensions.sgit.ai. Code Apache 2.0; content CC BY 4.0. No network calls, no telemetry.
 
 ## The one rule
@@ -20,6 +21,9 @@ with access, each removable; no network calls.
 - [Home](https://fix-the-page.chrome-extensions.sgit.ai/index.md): what it is, the rule, how a fix reaches a page, what it does not do, the roadmap.
 - [Install](https://fix-the-page.chrome-extensions.sgit.ai/install/index.md): from a clone of the repository or from the zip; chrome://extensions, Developer mode, Load unpacked.
 - [The title fix](https://fix-the-page.chrome-extensions.sgit.ai/use/title/index.md): modes, match patterns, always on a site, undo, My rules, the export format.
+- [The playground](https://fix-the-page.chrome-extensions.sgit.ai/use/playground/index.md): scripts under a policy, the eight capabilities, run and undo, experiments and their file.
+- [Script Behaviour Policies](https://fix-the-page.chrome-extensions.sgit.ai/articles/script-behaviour-policies/index.md): the ABP model applied to a script; static review and runtime enforcement.
+- [The plan](https://fix-the-page.chrome-extensions.sgit.ai/admin/plans/2026-10-25-split-and-fixes.md): split the extension from the site; a library of generic and site-specific fixes.
 - [Permissions](https://fix-the-page.chrome-extensions.sgit.ai/permissions/index.md): activeTab, scripting, storage, contextMenus, optional host permissions, each in Chrome's words.
 - [Privacy](https://fix-the-page.chrome-extensions.sgit.ai/privacy/index.md): nothing leaves the browser; what is stored and where.
 - [Source and releases](https://fix-the-page.chrome-extensions.sgit.ai/source/index.md): the files, the zip and SHA-256, the validator, the tests.
@@ -28,6 +32,7 @@ with access, each removable; no network calls.
 
 - Manifest V3. permissions: activeTab, scripting, storage, contextMenus. optional_host_permissions: https://*/*, http://*/*. No host_permissions. CSP: script-src 'self'; object-src 'self'; connect-src 'none'.
 - Rules: { id, match (Chrome match pattern), fix: "title", value, mode: set|prefix|suffix|template, created, enabled }, in chrome.storage.local under "rules". Export format: { format: "fix-the-page/rules", version: 1, exported, rules }.
-- Release: https://fix-the-page.chrome-extensions.sgit.ai/releases/fix-the-page-v0.1.0.zip with .sha256 beside it.
+- Script Behaviour Policy: { policy: "fix-the-page/sbp", version: 1, capabilities: [title.get|title.set|url.get|dom.count|dom.text|dom.hide|dom.setText|css.add], limits: { calls, ms }, selectors? }. Experiments file: { format: "fix-the-page/experiments", version: 1, exported, experiments: [{ id, name, match, policy, script, created, updated, notes? }] }.
+- Release: https://fix-the-page.chrome-extensions.sgit.ai/releases/fix-the-page-v0.2.0.zip with .sha256 beside it.
 - Repository: https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page
 - Origin: the newsroom article "Fix the page yourself", https://newsroom.sgit.ai/articles/fix-the-page-yourself.html
