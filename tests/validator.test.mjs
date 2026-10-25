@@ -24,8 +24,9 @@ function tree(files) {
 
 describe('A9: the manifest', () => {
   test('the shipped manifest passes', () => assert.deepEqual(v.checkManifest(manifest()), []));
-  test('only activeTab, scripting, storage and contextMenus', () => {
-    assert.deepEqual(manifest().permissions.sort(), ['activeTab', 'contextMenus', 'scripting', 'storage']);
+  test('only activeTab, scripting, storage, contextMenus and sidePanel', () => {
+    assert.deepEqual(manifest().permissions.sort(), ['activeTab', 'contextMenus', 'scripting', 'sidePanel', 'storage']);
+    assert.equal(manifest().side_panel.default_path, 'playground.html');
   });
   test('host_permissions is rejected', () => assert.match(v.checkManifest({ ...manifest(), host_permissions: ['https://example.com/*'] }).join('\n'), /host_permissions/));
   test('a test build is rejected as a release', () => {

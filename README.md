@@ -2,7 +2,7 @@
 
 A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on `activeTab`: the tab's title as a rule, and a playground where your own fixes run as scripts under a Script Behaviour Policy, in a sandbox, with undo. No network calls, no telemetry.
 
-Site: https://fix-the-page.chrome-extensions.sgit.ai (GitHub Pages, deployed from `dev`). A child of the hub [chrome-extensions.sgit.ai](https://chrome-extensions.sgit.ai); the idea is the newsroom's [Fix the page yourself](https://newsroom.sgit.ai/articles/fix-the-page-yourself.html).
+Site: https://fix-the-page.chrome-extension.sgit.ai (GitHub Pages, deployed from `dev`). A child of the hub [chrome-extensions.sgit.ai](https://chrome-extensions.sgit.ai); the idea is the newsroom's [Fix the page yourself](https://newsroom.sgit.ai/articles/fix-the-page-yourself.html).
 
 ## The one rule
 
@@ -16,7 +16,7 @@ So: `activeTab` instead of host permissions; fixes as declarative rules, not cod
 2. Developer mode on
 3. Load unpacked, and pick the `extension/` folder
 
-Then click the icon on any page, type a title, Apply. Tick "Always on this site" to keep it; Chrome asks for that one site. **Playground** in the popup opens the editor for your own fixes: a script, a policy of what it may do, run, undo, save, export. The [install page](https://fix-the-page.chrome-extensions.sgit.ai/install/) has the zip route and screenshots; [the playground page](https://fix-the-page.chrome-extensions.sgit.ai/use/playground/) and the article [Script Behaviour Policies](https://fix-the-page.chrome-extensions.sgit.ai/articles/script-behaviour-policies/) explain the rest.
+Then click the icon on any page, type a title, Apply. Tick "Always on this site" to keep it; Chrome asks for that one site. **Playground** in the popup opens the editor for your own fixes: a script, a policy of what it may do, run, undo, save, export. The [install page](https://fix-the-page.chrome-extension.sgit.ai/install/) has the zip route and screenshots; [the playground page](https://fix-the-page.chrome-extension.sgit.ai/use/playground/) and the article [Script Behaviour Policies](https://fix-the-page.chrome-extension.sgit.ai/articles/script-behaviour-policies/) explain the rest.
 
 ## Structure
 

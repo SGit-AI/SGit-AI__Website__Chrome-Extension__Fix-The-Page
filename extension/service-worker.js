@@ -10,6 +10,7 @@
 
 const SCRIPT_PREFIX = 'ftp:';
 const MENU_ID = 'ftp-set-title';
+const MENU_PANEL_ID = 'ftp-open-playground';
 
 function scriptIdFor(originPattern) { return SCRIPT_PREFIX + originPattern; }
 
@@ -82,7 +83,14 @@ chrome.permissions.onRemoved.addListener(() => { reconcile(); });
 // The context menu item is a user gesture that grants activeTab for this tab. Put the engine on the
 // page (it applies any stored rules that match), then open the popup for the user to type a title.
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId !== MENU_ID || !tab || !tab.id) return;
+  if (!tab || !tab.id) return;
+  if (info.menuItemId === MENU_PANEL_ID) {
+    // The side panel opens beside this tab. A context menu click is a user gesture, which sidePanel.open
+    // requires, and one of the gestures that grant activeTab, so the panel can see this tab.
+    try { await chrome.sidePanel.open({ tabId: tab.id }); } catch (e) { /* older Chrome: the popup's button is the way in */ }
+    return;
+  }
+  if (info.menuItemId !== MENU_ID) return;
   try { await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['engine.js'] }); } catch (e) { /* restricted page */ }
   try { await chrome.action.openPopup({ windowId: tab.windowId }); } catch (e) { /* older Chrome: the toolbar icon is the way in */ }
 });

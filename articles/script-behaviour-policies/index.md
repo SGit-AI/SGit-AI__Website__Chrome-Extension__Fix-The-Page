@@ -11,7 +11,7 @@ status: published
 
 # Script Behaviour Policies: a behaviour policy for a line of JavaScript
 
-https://fix-the-page.chrome-extensions.sgit.ai/articles/script-behaviour-policies/ · [as HTML](index.html) · status: built
+https://fix-the-page.chrome-extension.sgit.ai/articles/script-behaviour-policies/ · [as HTML](index.html) · status: built
 
 ## In short
 

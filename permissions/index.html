@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Permissions · Fix the Page</title>
 <meta name="description" content="Every permission Fix the Page asks for, why, what it can and cannot do, in Chrome&#x27;s own words: activeTab, scripting, storage, contextMenus, and optional host permissions granted one site at a time. And the ones it does not ask for.">
-<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/permissions/index.html">
+<link rel="canonical" href="https://fix-the-page.chrome-extension.sgit.ai/permissions/index.html">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
-<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/permissions/index.html">
+<meta property="og:site_name" content="fix-the-page.chrome-extension.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extension.sgit.ai/permissions/index.html">
 <meta property="og:title" content="Permissions · Fix the Page">
 <meta property="og:description" content="Every permission Fix the Page asks for, why, what it can and cannot do, in Chrome&#x27;s own words: activeTab, scripting, storage, contextMenus, and optional host permissions granted one site at a time. And the ones it does not ask for.">
 <meta name="twitter:card" content="summary">
@@ -19,10 +19,10 @@
 <body>
 
 <nav class="site"><div class="row">
-  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extension.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.2 · the playground</span>
-  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <span class="stage-pill">v0.3 · the playground, beside the page</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.3.0</a>
   <a class="nl" href="../install/index.html">Install</a>
   <a class="nl" href="../use/title/index.html">The title fix</a>
   <a class="nl" href="../use/playground/index.html">Playground</a>
@@ -34,11 +34,11 @@
 </div></nav>
 
 <main class="doc">
-<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / permissions</div>
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extension.sgit.ai</a> / permissions</div>
 <h1>Permissions</h1>
-<p class="lead">Four permissions and one optional one. Each is here with what it is for, what it lets the extension do, what it does not, and Chrome's own description of it, fetched from <a href="https://developer.chrome.com/docs/extensions">developer.chrome.com</a> on 24 October 2026. Chrome's documentation changes; the links go to the current page.</p>
+<p class="lead">Five permissions and one optional one. Each is here with what it is for, what it lets the extension do, what it does not, and Chrome's own description of it, fetched from <a href="https://developer.chrome.com/docs/extensions">developer.chrome.com</a> on 24 October 2026. Chrome's documentation changes; the links go to the current page.</p>
 
-<div class="note"><b>The manifest, as shipped.</b> <code>"permissions": ["activeTab", "scripting", "storage", "contextMenus"]</code> and <code>"optional_host_permissions": ["https://*/*", "http://*/*"]</code>. No <code>host_permissions</code>. The <a href="../source/index.html#validator">validator</a> rejects a build whose manifest says anything else.</div>
+<div class="note"><b>The manifest, as shipped.</b> <code>"permissions": ["activeTab", "scripting", "storage", "contextMenus", "sidePanel"]</code> and <code>"optional_host_permissions": ["https://*/*", "http://*/*"]</code>. No <code>host_permissions</code>. The <a href="../source/index.html#validator">validator</a> rejects a build whose manifest says anything else.</div>
 
 <div class="perm" id="activetab">
   <h3>activeTab</h3>
@@ -66,6 +66,13 @@
   <p class="why"><b>Why:</b> one item on a page's right-click menu, "Set this tab's title…", as a second way in. Chrome counts "executing a context menu item" among the gestures that grant <code>activeTab</code>, so it reaches the same tab the click was on.</p>
   <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/contextMenus">chrome.contextMenus</a>): the API adds items to Google Chrome's context menu. It carries no access to page content.</p>
   <p class="cannot"><b>Cannot:</b> read anything about the page. The item knows only that it was clicked, and in which tab.</p>
+</div>
+
+<div class="perm" id="sidepanel">
+  <h3>sidePanel</h3>
+  <p class="why"><b>Why:</b> so the playground can open beside the page it works on, in Chrome's side panel, and stay there while you browse.</p>
+  <p class="why"><b>Chrome says</b> (<a href="https://developer.chrome.com/docs/extensions/reference/api/sidePanel">chrome.sidePanel</a>): "To use the Side Panel API, add the "sidePanel" permission in the extension manifest file." The panel's page is set by <code>side_panel.default_path</code>. <code>sidePanel.open()</code> "may only be called in response to a user action", which here is the button in the popup or the context menu item. "The side panel remains open when navigating between tabs." "As an extension page, side panels have access to all Chrome APIs", which means the same APIs as the popup, no more: a page in the panel sees a tab only when <code>activeTab</code> or a granted site allows it.</p>
+  <p class="cannot"><b>Cannot:</b> see or touch a page by itself. It is a place for the extension's own page to live; what that page may do is set by the other permissions.</p>
 </div>
 
 <div class="perm" id="optional">
@@ -98,10 +105,10 @@
 
 <footer class="site"><div class="cols">
   <div>
-    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <div class="brandline">fix-the-page<span>.chrome-extension.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.3.0</a> · <a href="../releases/fix-the-page-v0.3.0.zip">download fix-the-page-v0.3.0.zip</a> · <a href="index.md">this page as markdown</a></p>
   </div>
   <div>
     <h4>The extension</h4>

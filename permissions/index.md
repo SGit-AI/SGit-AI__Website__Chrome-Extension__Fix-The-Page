@@ -1,8 +1,8 @@
 # Permissions
 
-https://fix-the-page.chrome-extensions.sgit.ai/permissions/ · [as HTML](index.html) · site v0.1.0
+https://fix-the-page.chrome-extension.sgit.ai/permissions/ · [as HTML](index.html) · site v0.1.0
 
-The manifest: `"permissions": ["activeTab", "scripting", "storage", "contextMenus"]`, `"optional_host_permissions": ["https://*/*", "http://*/*"]`, no `host_permissions`. The validator rejects anything else. Chrome's words below were fetched from developer.chrome.com on 24 October 2026.
+The manifest: `"permissions": ["activeTab", "scripting", "storage", "contextMenus", "sidePanel"]`, `"optional_host_permissions": ["https://*/*", "http://*/*"]`, no `host_permissions`. The validator rejects anything else. Chrome's words below were fetched from developer.chrome.com on 24 October 2026.
 
 ## activeTab
 
@@ -33,6 +33,14 @@ Cannot: see any site's storage, cookies or data.
 Why: one right-click item, "Set this tab's title…", a second way in that also grants `activeTab`.
 
 Cannot: read anything about the page.
+
+## sidePanel
+
+Why: so the playground can open beside the page it works on, in Chrome's side panel, and stay there while you browse.
+
+Chrome ([chrome.sidePanel](https://developer.chrome.com/docs/extensions/reference/api/sidePanel)): "To use the Side Panel API, add the "sidePanel" permission in the extension manifest file." `sidePanel.open()` "may only be called in response to a user action". "The side panel remains open when navigating between tabs." "As an extension page, side panels have access to all Chrome APIs": the same as the popup, no more.
+
+Cannot: see or touch a page by itself; what the panel's page may do is set by the other permissions.
 
 ## optional_host_permissions: https://*/* and http://*/*
 

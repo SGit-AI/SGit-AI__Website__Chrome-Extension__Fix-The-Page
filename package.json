@@ -1,6 +1,6 @@
 {
   "name": "fix-the-page",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Fix the Page: a Chrome extension that fixes the page you are on, only when you ask. Site and extension source.",
   "license": "Apache-2.0",

@@ -12,12 +12,12 @@
     <h1>Fix the Page: playground</h1>
     <p class="dim">Write a small fix as a script, declare what it may do, run it on a page, see exactly what it did, undo it, keep it. The script runs in a sandbox with nothing in it but the capabilities you tick; every call is checked against the policy before it reaches the page.</p>
   </div>
-  <nav class="links"><a href="options.html">My rules</a> · <a href="https://fix-the-page.chrome-extensions.sgit.ai/use/playground/" target="_blank" rel="noopener">how it works</a></nav>
+  <nav class="links"><a id="open-in-tab" href="playground.html" hidden>Open in a tab</a> <a href="options.html" target="_blank" rel="noopener">My rules</a> · <a href="https://fix-the-page.chrome-extension.sgit.ai/use/playground/" target="_blank" rel="noopener">how it works</a></nav>
 </header>
 
 <section id="restricted" class="panel warn" hidden>
-  <p><b>No page to work on.</b> <span id="restricted-why"></span></p>
-  <p class="dim">Open the playground from the Fix the Page popup on a normal web page, and it works on that tab. You can still write, save, export and import experiments here.</p>
+  <p><b>No page to work on yet.</b> <span id="restricted-why"></span></p>
+  <p class="dim">You can still write, save, export and import experiments here.</p>
 </section>
 
 <main class="grid">
@@ -37,7 +37,7 @@
 
     <label for="script">Script</label>
     <div class="examples"><span class="dim small">Start from an example:</span> <select id="example" aria-label="Examples"><option value="">choose</option></select></div>
-    <textarea id="script" rows="14" spellcheck="false" placeholder="await page.title.set('Ops dashboard');"></textarea>
+    <textarea id="script" rows="10" spellcheck="false" placeholder="await page.title.set('Ops dashboard');"></textarea>
     <p class="hint">The script is the body of an <code>async</code> function. It sees one object, <code>page</code>, with the capabilities ticked below, and <code>log()</code>. Nothing else exists in its world: no <code>document</code>, no <code>window</code>, no network.</p>
 
     <fieldset id="policy">

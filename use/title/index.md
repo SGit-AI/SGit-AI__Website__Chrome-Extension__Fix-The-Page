@@ -1,6 +1,6 @@
 # The title fix
 
-https://fix-the-page.chrome-extensions.sgit.ai/use/title/ · [as HTML](index.html) · site v0.1.0 · status: built
+https://fix-the-page.chrome-extension.sgit.ai/use/title/ · [as HTML](index.html) · site v0.1.0 · status: built
 
 Make a tab's title say what you want, in one of four ways, on this page now or on every page of a site, with a visible list of what you did and one click to undo it.
 

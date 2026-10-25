@@ -1,6 +1,6 @@
 # Fix the Page: fix the page you are on, only when you ask
 
-Site and extension version v0.2.0 (25 October 2026). https://fix-the-page.chrome-extensions.sgit.ai/
+Site and extension version v0.3.0 (25 October 2026). https://fix-the-page.chrome-extension.sgit.ai/
 
 One generic Chrome extension that can fix any kind of site, built on `activeTab`. It touches a tab only when you invoke it there, it keeps nothing it does not need, and it can say exactly what it changed. Version 0.1 ships one fix: the tab's title.
 
@@ -15,11 +15,11 @@ Everything else follows: `activeTab` instead of host permissions; fixes as rules
 - **Set this tab's title.** Click the icon, type, Apply. Immediate, even on a single-page app that rewrites its title. Lasts until you leave or reload.
 - **Keep it, on one site.** Tick "Always on this site"; Chrome asks for that one site; the title is applied on every visit with no further clicks.
 - **Review, edit, undo.** "My rules" lists every rule and every site with access, each removable. Export and import as JSON. Undo on any page.
-- **Say exactly what it may touch.** Four permissions, explained with Chrome's own words. No host permissions at install, no remote code, no network.
+- **Say exactly what it may touch.** Five permissions, explained with Chrome's own words. No host permissions at install, no remote code, no network.
 
 ## New in 0.2: the playground, and a policy for every script (built)
 
-Write a small fix as a script, tick what it may do, run it on a page, see exactly what it did, undo it, keep it. The script runs in a sandbox with nothing in it but the capabilities ticked, and every call is checked against a Script Behaviour Policy before it reaches the page. Eight reversible capabilities; saved experiments in your browser; export as a file to share. See [the playground](use/playground/index.md) and the article [Script Behaviour Policies](articles/script-behaviour-policies/index.md). The [plan](admin/plans/2026-10-25-split-and-fixes.md) proposes splitting the extension into its own repository and starting a library of fixes.
+Write a small fix as a script, tick what it may do, run it on a page, see exactly what it did, undo it, keep it. The playground opens in Chrome's side panel beside the page and follows the active tab it is allowed to see. The script runs in a sandbox with nothing in it but the capabilities ticked, and every call is checked against a Script Behaviour Policy before it reaches the page. Eight reversible capabilities; saved experiments in your browser; export as a file to share. See [the playground](use/playground/index.md) and the article [Script Behaviour Policies](articles/script-behaviour-policies/index.md). The [plan](admin/plans/2026-10-25-split-and-fixes.md) proposes splitting the extension into its own repository and starting a library of fixes.
 
 ## How a fix reaches a page
 

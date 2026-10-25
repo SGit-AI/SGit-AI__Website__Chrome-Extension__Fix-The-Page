@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Source and releases · Fix the Page</title>
 <meta name="description" content="The source of Fix the Page, file by file; the current release zip and its SHA-256; what the validator refuses; the three layers of tests; how to build it yourself; licence and credits.">
-<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/source/index.html">
+<link rel="canonical" href="https://fix-the-page.chrome-extension.sgit.ai/source/index.html">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
-<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/source/index.html">
+<meta property="og:site_name" content="fix-the-page.chrome-extension.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extension.sgit.ai/source/index.html">
 <meta property="og:title" content="Source and releases · Fix the Page">
 <meta property="og:description" content="The source of Fix the Page, file by file; the current release zip and its SHA-256; what the validator refuses; the three layers of tests; how to build it yourself; licence and credits.">
 <meta name="twitter:card" content="summary">
@@ -19,10 +19,10 @@
 <body>
 
 <nav class="site"><div class="row">
-  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="brand" href="../index.html">fix-the-page<span>.chrome-extension.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.2 · the playground</span>
-  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <span class="stage-pill">v0.3 · the playground, beside the page</span>
+  <a class="ver" href="../admin/versions.html" title="Release history" data-site-version>v0.3.0</a>
   <a class="nl" href="../install/index.html">Install</a>
   <a class="nl" href="../use/title/index.html">The title fix</a>
   <a class="nl" href="../use/playground/index.html">Playground</a>
@@ -34,7 +34,7 @@
 </div></nav>
 
 <main class="doc">
-<div class="crumb"><a href="../index.html">fix-the-page.chrome-extensions.sgit.ai</a> / source</div>
+<div class="crumb"><a href="../index.html">fix-the-page.chrome-extension.sgit.ai</a> / source</div>
 <h1>Source and releases</h1>
 <p class="lead">The article this extension comes from says such an extension "could be shipped from a GitHub repository or an encrypted vault and loaded locally, so the reader can see exactly what they are installing". So: the whole extension is a dozen small files with no dependencies, readable in one sitting, and every release is a zip of exactly those files with its hash published here.</p>
 
@@ -42,16 +42,16 @@
 <div class="tablewrap"><table>
   <thead><tr><th>Version</th><th>File</th><th>SHA-256</th></tr></thead>
   <tbody>
-    <tr><td class="vnum" style="font-family:var(--mono);font-weight:700;color:var(--accent-dk)">v0.2.0</td><td><a href="../releases/fix-the-page-v0.2.0.zip">fix-the-page-v0.2.0.zip</a> · <a href="../releases/fix-the-page-v0.2.0.zip.sha256">.sha256</a></td><td><div class="hashbox"><code class="sha256">402ff0e1c0626136a1e37933ec0cb3a298a775ccf65c79fca5a7310ebca287e0</code></div></td></tr>
+    <tr><td class="vnum" style="font-family:var(--mono);font-weight:700;color:var(--accent-dk)">v0.3.0</td><td><a href="../releases/fix-the-page-v0.3.0.zip">fix-the-page-v0.3.0.zip</a> · <a href="../releases/fix-the-page-v0.3.0.zip.sha256">.sha256</a></td><td><div class="hashbox"><code class="sha256">aea6be1abcee35051c90b1cb0d8cf3c573ace2f4633b845c248a6f82041b5299</code></div></td></tr>
   </tbody>
 </table></div>
-<p>To check a download: <code>shasum -a 256 fix-the-page-v0.2.0.zip</code> (macOS, Linux) or <code>certutil -hashfile fix-the-page-v0.2.0.zip SHA256</code> (Windows) and compare with the hash above. The zip is built by <code>admin/build/package.mjs</code> from <code>extension/</code>, and the validator refuses a release whose zip differs from <code>extension/</code> in any byte, or whose hash file does not match. The site's version, the extension's version and the zip's name are one number: <a href="../admin/versions.html">the release history</a> has them all.</p>
+<p>To check a download: <code>shasum -a 256 fix-the-page-v0.3.0.zip</code> (macOS, Linux) or <code>certutil -hashfile fix-the-page-v0.3.0.zip SHA256</code> (Windows) and compare with the hash above. The zip is built by <code>admin/build/package.mjs</code> from <code>extension/</code>, and the validator refuses a release whose zip differs from <code>extension/</code> in any byte, or whose hash file does not match. The site's version, the extension's version and the zip's name are one number: <a href="../admin/versions.html">the release history</a> has them all.</p>
 
 <h2 id="files">The extension, file by file</h2>
 <div class="tablewrap"><table>
   <thead><tr><th>File</th><th>What it does</th></tr></thead>
   <tbody>
-    <tr><td><code>manifest.json</code></td><td>Manifest V3. The four permissions, the optional host permissions, the CSP, the popup, the options page, the shortcut. <a href="../permissions/index.html">Explained here.</a></td></tr>
+    <tr><td><code>manifest.json</code></td><td>Manifest V3. The five permissions, the optional host permissions, the CSP, the sandbox page, the popup, the options page, the side panel, the shortcut. <a href="../permissions/index.html">Explained here.</a></td></tr>
     <tr><td><code>engine.js</code></td><td>The one script that touches a page. Half of it is pure functions with no DOM: parse a match pattern, match a URL, compute a title from a rule, validate a rule, validate an import file. Node tests them without a browser. The other half applies rules to <code>document.title</code>, watches the <code>&lt;title&gt;</code> element and the URL, and undoes. Injected both on demand and as a registered content script; idempotent either way.</td></tr>
     <tr><td><code>bridge.js</code></td><td>Runs in the page's own world for one purpose: to notice a site that publishes <code>window.__tools.page</code> and leave its name and version on an attribute the engine can read. Twenty lines.</td></tr>
     <tr><td><code>service-worker.js</code></td><td>Keeps the registered content scripts in step with the origins you have granted, answers the popup and the options page, and adds the context menu item. Makes no network calls, never reads a page.</td></tr>
@@ -78,7 +78,7 @@
   <li>Version agreement: <code>admin/build/version.txt</code>, <code>assets/version.js</code>, every page's badge, <code>llms.txt</code>, <code>index.md</code>, the versions table, <code>extension/manifest.json</code>, <code>extension/build.json</code> and <code>package.json</code> all carry the same version.</li>
   <li>Every internal link resolves; every canonical URL is on this host and names its own page.</li>
   <li>No file in the tree looks like a key, a token or a private key.</li>
-  <li><b>The manifest:</b> no <code>host_permissions</code>; no <code>tabs</code>, <code>history</code>, <code>cookies</code>, <code>webRequest</code>, <code>debugger</code> or <code>&lt;all_urls&gt;</code>; only the four permissions; optional host permissions for http and https only; no static content scripts; a CSP with no remote or unsafe source and <code>connect-src 'none'</code>.</li>
+  <li><b>The manifest:</b> no <code>host_permissions</code>; no <code>tabs</code>, <code>history</code>, <code>cookies</code>, <code>webRequest</code>, <code>debugger</code> or <code>&lt;all_urls&gt;</code>; only the five permissions; optional host permissions for http and https only; no static content scripts; a CSP with no remote or unsafe source and <code>connect-src 'none'</code>.</li>
   <li><b>The code:</b> no <code>eval</code>, <code>new Function</code>, <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>importScripts</code>, <code>sendBeacon</code>, string timers, <code>innerHTML</code> assignment, inline scripts or handlers, or any URL of a remote script or stylesheet.</li>
   <li><b>The release:</b> the zip and its <code>.sha256</code> exist for this version, the hash matches, the zip's files equal <code>extension/</code> byte for byte, the zip's manifest is not a test build, and this page publishes the current hash.</li>
   <li>Every page links to the current release.</li>
@@ -102,7 +102,7 @@
 <pre class="shell"><span class="g">$</span> git clone https://github.com/SGit-AI/SGit-AI__Website__Chrome-Extension__Fix-The-Page.git
 <span class="g">$</span> cd SGit-AI__Website__Chrome-Extension__Fix-The-Page
 <span class="g">$</span> npm test                          <span class="d"># needs Node 22 and Playwright with Chromium</span>
-<span class="g">$</span> node admin/build/package.mjs      <span class="d"># releases/fix-the-page-v0.2.0.zip and its .sha256</span>
+<span class="g">$</span> node admin/build/package.mjs      <span class="d"># releases/fix-the-page-v0.3.0.zip and its .sha256</span>
 <span class="g">$</span> node admin/build/validate.js</pre>
 <p>The zip writer is deterministic: the same tree gives the same bytes, apart from the build stamp.</p>
 
@@ -118,10 +118,10 @@
 
 <footer class="site"><div class="cols">
   <div>
-    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <div class="brandline">fix-the-page<span>.chrome-extension.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.2.0</a> · <a href="../releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+    <p class="verline">site and extension <a href="../admin/versions.html" data-site-version>v0.3.0</a> · <a href="../releases/fix-the-page-v0.3.0.zip">download fix-the-page-v0.3.0.zip</a> · <a href="index.md">this page as markdown</a></p>
   </div>
   <div>
     <h4>The extension</h4>

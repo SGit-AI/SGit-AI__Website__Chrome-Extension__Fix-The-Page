@@ -1,4 +1,4 @@
-# Deploys fix-the-page.chrome-extensions.sgit.ai (this repo's working tree) to GitHub Pages, with the
+# Deploys fix-the-page.chrome-extension.sgit.ai (this repo's working tree) to GitHub Pages, with the
 # same pipeline order as the hub (SGit-AI__Website__Chrome-Extensions) and its siblings:
 # validate -> test -> tag -> publish.
 #

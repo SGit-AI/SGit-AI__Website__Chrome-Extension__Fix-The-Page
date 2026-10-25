@@ -1,6 +1,6 @@
 # Privacy
 
-https://fix-the-page.chrome-extensions.sgit.ai/privacy/ · [as HTML](index.html) · site v0.1.0
+https://fix-the-page.chrome-extension.sgit.ai/privacy/ · [as HTML](index.html) · site v0.1.0
 
 Nothing leaves your browser. The extension makes no network calls, sends no telemetry, has no account, and reads from a page only the URL and the title.
 

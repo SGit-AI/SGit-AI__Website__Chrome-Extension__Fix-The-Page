@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// fix-the-page.chrome-extensions.sgit.ai pre-release gate. Run from anywhere: node admin/build/validate.js
+// fix-the-page.chrome-extension.sgit.ai pre-release gate. Run from anywhere: node admin/build/validate.js
 //
 // Started from the hub's validator (chrome-extensions.sgit.ai, admin/build/validate.js, Apache 2.0), minus
 // its target-anonymity blocklist, which belongs to the hub. Checks, in order:
@@ -39,7 +39,7 @@ function walk(dir, out = []) {
 const rel = (f) => path.relative(ROOT, f);
 
 // ---- 6 and 7: the extension, as functions so the tests can point them at other trees ----------------
-const ALLOWED_PERMISSIONS = ['activeTab', 'scripting', 'storage', 'contextMenus'];
+const ALLOWED_PERMISSIONS = ['activeTab', 'scripting', 'storage', 'contextMenus', 'sidePanel'];
 const BANNED_PERMISSIONS = ['tabs', 'history', 'cookies', 'webRequest', 'webRequestBlocking', 'debugger', 'declarativeNetRequest', 'userScripts', '<all_urls>'];
 
 function checkManifest(manifest, { release = true } = {}) {
@@ -67,6 +67,7 @@ function checkManifest(manifest, { release = true } = {}) {
     if (!/connect-src 'none'/.test(csp)) errors.push('CSP must set connect-src \'none\' (ABP rule 3)');
   }
   if (manifest.background && manifest.background.scripts) errors.push('MV3 background must be a service worker');
+  if (manifest.side_panel && !/^[a-z0-9_-]+\.html$/.test(manifest.side_panel.default_path || '')) errors.push('side_panel.default_path must be a local html file');
   const sandboxPages = (manifest.sandbox && manifest.sandbox.pages) || [];
   if (sandboxPages.length) {
     const scsp = manifest.content_security_policy && manifest.content_security_policy.sandbox;

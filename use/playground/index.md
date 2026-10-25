@@ -1,12 +1,14 @@
 # The playground
 
-https://fix-the-page.chrome-extensions.sgit.ai/use/playground/ · [as HTML](index.html) · site v0.2.0 · status: built
+https://fix-the-page.chrome-extension.sgit.ai/use/playground/ · [as HTML](index.html) · site v0.3.0 · status: built
 
 Write a small script, tick what it may do, run it on the tab you came from, read what it did, undo it, keep it.
 
-## Opening it
+## Opening it, beside the page
 
-Click the Fix the Page icon on the page you want to work on, then **Playground** in the popup. It opens in a new tab bound to the tab you came from (the activeTab grant from the click). Opened on its own, it says so and still lets you write, save, export and import.
+Click the Fix the Page icon on the page you want to work on, then **Open the playground beside this page**. It opens in Chrome's side panel and stays open while you browse (Chrome: the panel "remains open when navigating between tabs"; `sidePanel.open()` "may only be called in response to a user action"). The right-click menu has the same item.
+
+The panel follows the active tab as long as the extension may see it: after you click the icon on that tab (activeTab), and on any site allowed with "Always on this site". On any other tab it says "No page to work on yet" and what to click. Undo reaches the tab a run was on even after you switched away. "Open in a tab" gives the same playground as a full page bound to one tab.
 
 ## The script
 

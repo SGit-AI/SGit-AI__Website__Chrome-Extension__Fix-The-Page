@@ -63,3 +63,13 @@ pre.json{font-family:var(--mono);font-size:.75rem;background:var(--panel2);borde
 iframe#sandbox{width:0;height:0;border:0}
 
 label.btn{display:inline-block;text-transform:none;letter-spacing:0;font-weight:400;font-size:.9rem;color:var(--fg);margin:0}
+
+/* the side panel is narrow: tighter spacing, one column */
+body.panel header.top{padding:1rem .9rem 0;gap:.6rem}
+body.panel header.top h1{font-size:1.15rem}
+body.panel header.top p{font-size:.88rem}
+body.panel nav.links{font-size:.82rem;white-space:normal}
+body.panel main.grid{grid-template-columns:1fr;padding:.6rem .9rem 2rem;gap:1rem}
+body.panel .panel{margin:.6rem .9rem 0}
+body.panel .caps{grid-template-columns:1fr}
+body.panel h2{margin-top:1rem}

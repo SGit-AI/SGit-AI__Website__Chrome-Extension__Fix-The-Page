@@ -8,7 +8,7 @@
 <body>
 <header>
   <h1>Fix the Page</h1>
-  <span class="links"><a id="playground-link" href="playground.html" target="_blank" rel="noopener">Playground</a> · <a id="rules-link" href="options.html" target="_blank" rel="noopener">My rules</a></span>
+  <span class="links"><span id="version-pill" class="pill"></span> <a id="rules-link" href="options.html" target="_blank" rel="noopener">My rules</a></span>
 </header>
 
 <section id="restricted" class="panel" hidden>
@@ -57,9 +57,15 @@
     </div>
     <p id="message" class="message" role="status" aria-live="polite"></p>
   </form>
+
+  <div class="panelbox">
+    <button id="open-panel" type="button" class="primary wide">Open the playground beside this page &rarr;</button>
+    <p class="hint">Write a fix as a script under a policy, run it on this page, undo it, keep it. The panel stays open while you browse; click the icon on another page to point it there.</p>
+    <div class="buttons"><button id="playground-link" type="button">Open in a tab instead</button></div>
+  </div>
 </section>
 
-<footer><span id="version"></span> · <a href="https://fix-the-page.chrome-extensions.sgit.ai/" target="_blank" rel="noopener">how it works</a></footer>
+<footer><span id="version"></span> · no network, no telemetry · <a href="https://fix-the-page.chrome-extension.sgit.ai/" target="_blank" rel="noopener">how it works</a></footer>
 
 <script src="engine.js"></script>
 <script src="popup.js"></script>

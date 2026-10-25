@@ -1,22 +1,22 @@
 # Source and releases
 
-https://fix-the-page.chrome-extensions.sgit.ai/source/ · [as HTML](index.html) · site v0.1.0
+https://fix-the-page.chrome-extension.sgit.ai/source/ · [as HTML](index.html) · site v0.1.0
 
 The whole extension is a dozen small files with no dependencies, and every release is a zip of exactly those files with its hash published here.
 
 ## The current release
 
 - Version: v0.1.0
-- File: [fix-the-page-v0.2.0.zip](../releases/fix-the-page-v0.2.0.zip) · [.sha256](../releases/fix-the-page-v0.2.0.zip.sha256)
-- SHA-256: `402ff0e1c0626136a1e37933ec0cb3a298a775ccf65c79fca5a7310ebca287e0`
+- File: [fix-the-page-v0.3.0.zip](../releases/fix-the-page-v0.3.0.zip) · [.sha256](../releases/fix-the-page-v0.3.0.zip.sha256)
+- SHA-256: `aea6be1abcee35051c90b1cb0d8cf3c573ace2f4633b845c248a6f82041b5299`
 
-Check with `shasum -a 256 fix-the-page-v0.2.0.zip`. The validator refuses a release whose zip differs from `extension/` in any byte or whose hash file does not match.
+Check with `shasum -a 256 fix-the-page-v0.3.0.zip`. The validator refuses a release whose zip differs from `extension/` in any byte or whose hash file does not match.
 
 ## The extension, file by file
 
 | File | What it does |
 |---|---|
-| `manifest.json` | Manifest V3: the four permissions, optional host permissions, CSP, popup, options page, shortcut |
+| `manifest.json` | Manifest V3: the five permissions, optional host permissions, CSP, sandbox page, popup, options page, side panel, shortcut |
 | `engine.js` | The one script that touches a page. Pure core (match patterns, compute title, validate rule and import) plus the page part (apply, observe, undo). Idempotent. |
 | `bridge.js` | Detects a site's `window.__tools.page` from the page's world |
 | `service-worker.js` | Keeps registered content scripts in step with granted origins; answers the popup and options page; the context menu item |

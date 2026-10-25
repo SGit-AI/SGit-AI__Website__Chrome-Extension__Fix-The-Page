@@ -289,6 +289,48 @@ describe('the playground', () => {
     await pg.close();
   });
 
+  test('panel mode: opened without a tab, it follows the active tab it is allowed to see', async () => {
+    await setRules([]); // an earlier test leaves a stored prefix rule, which an injected engine would apply
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const pg = await context.newPage();
+    await pg.goto(`chrome-extension://${extId}/playground.html`);
+    await pg.waitForSelector('#restricted:not([hidden])'); // the active tab is the playground itself
+    assert.equal(await pg.evaluate(() => document.body.classList.contains('panel')), true);
+    // the user switches to the page: the panel re-binds (the test build may see every 127.0.0.1 tab)
+    await sw.evaluate((url) => chrome.tabs.query({ url }).then((t) => chrome.tabs.update(t[t.length - 1].id, { active: true })), server.base + '/static.html');
+    await pg.waitForFunction(() => window.ftpPlayground.tab() && window.ftpPlayground.tab().url.endsWith('/static.html'), null, { timeout: 5000 });
+    assert.equal(await pg.locator('#page').isVisible(), true);
+    assert.equal(await pg.inputValue('#match'), server.base + '/*');
+    assert.equal(await pg.locator('#open-in-tab').isVisible(), true);
+    await setForm(pg, { name: 'Panel', match: server.base + '/*', script: "await page.title.set('From the panel');", policy: { capabilities: ['title.set'], limits: { calls: 100, ms: 5000 } } });
+    const log = await runAndWait(pg);
+    assert.ok(log.some((l) => /^done in/.test(l)), log.join('\n'));
+    assert.equal(await page.title(), 'From the panel');
+    // switching to a tab the extension may not see: the panel says so, and undo still reaches the old tab
+    const chromePage = await context.newPage();
+    await chromePage.goto('chrome://version/');
+    await pg.waitForFunction(() => !window.ftpPlayground.tab(), null, { timeout: 5000 });
+    assert.match(await pg.locator('#restricted').innerText(), /does not allow extensions|Click the Fix the Page icon/);
+    await pg.click('#undo');
+    await pg.waitForFunction(() => document.getElementById('message').textContent.includes('Undid'));
+    assert.equal(await page.title(), 'Original');
+    await chromePage.close(); await pg.close(); await page.close();
+  });
+
+  test('the popup offers the side panel and a tab', async () => {
+    const page = await context.newPage();
+    await page.goto(server.base + '/static.html');
+    const id = await tabIdFor(server.base + '/static.html');
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${extId}/popup.html?tabId=${id}`);
+    await popup.waitForSelector('#main:not([hidden])');
+    assert.equal(await popup.locator('#open-panel').isVisible(), true);
+    assert.equal(await popup.locator('#playground-link').isVisible(), true);
+    assert.match(await popup.locator('#version-pill').innerText(), /^v0\.\d+\.\d+$/);
+    await popup.close(); await page.close();
+  });
+
   test('a script under a matching policy runs, changes the tab, and undo reverses it', async () => {
     await setRules([]);
     const page = await context.newPage();

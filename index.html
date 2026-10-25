@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fix the Page: fix the page you are on, only when you ask</title>
 <meta name="description" content="A Chrome extension that fixes the page you are on, only when you ask: one generic extension built on activeTab, starting with the tab&#x27;s title. No network, no telemetry. Install from the repository or the zip, and read the source.">
-<link rel="canonical" href="https://fix-the-page.chrome-extensions.sgit.ai/index.html">
+<link rel="canonical" href="https://fix-the-page.chrome-extension.sgit.ai/index.html">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="fix-the-page.chrome-extensions.sgit.ai">
-<meta property="og:url" content="https://fix-the-page.chrome-extensions.sgit.ai/index.html">
+<meta property="og:site_name" content="fix-the-page.chrome-extension.sgit.ai">
+<meta property="og:url" content="https://fix-the-page.chrome-extension.sgit.ai/index.html">
 <meta property="og:title" content="Fix the Page: fix the page you are on, only when you ask">
 <meta property="og:description" content="A Chrome extension that fixes the page you are on, only when you ask: one generic extension built on activeTab, starting with the tab&#x27;s title. No network, no telemetry. Install from the repository or the zip, and read the source.">
 <meta name="twitter:card" content="summary">
@@ -19,10 +19,10 @@
 <body>
 
 <nav class="site"><div class="row">
-  <a class="brand" href="index.html">fix-the-page<span>.chrome-extensions.sgit.ai</span></a>
+  <a class="brand" href="index.html">fix-the-page<span>.chrome-extension.sgit.ai</span></a>
   <a class="parent" href="https://chrome-extensions.sgit.ai" title="chrome-extensions.sgit.ai: the hub this extension belongs to">&#8599; part of <b>chrome-extensions.sgit.ai</b></a>
-  <span class="stage-pill">v0.2 · the playground</span>
-  <a class="ver" href="admin/versions.html" title="Release history" data-site-version>v0.2.0</a>
+  <span class="stage-pill">v0.3 · the playground, beside the page</span>
+  <a class="ver" href="admin/versions.html" title="Release history" data-site-version>v0.3.0</a>
   <a class="nl" href="install/index.html">Install</a>
   <a class="nl" href="use/title/index.html">The title fix</a>
   <a class="nl" href="use/playground/index.html">Playground</a>
@@ -56,7 +56,7 @@
     <a class="card" href="use/title/index.html"><span class="tag">Built</span><h3>Set this tab's title</h3><p>Click the icon, type, Apply. The tab says what you typed, now, even on a single-page app that keeps rewriting its own title. It lasts until you leave or reload the page.</p><span class="go">How &rarr;</span></a>
     <a class="card" href="use/title/index.html#always"><span class="tag">Built</span><h3>Keep it, on one site</h3><p>Tick "Always on this site". Chrome asks you to allow that one site. From then on the title is applied on every visit to matching pages, with no further clicks.</p><span class="go">How &rarr;</span></a>
     <a class="card" href="use/title/index.html#rules"><span class="tag">Built</span><h3>Review, edit, undo</h3><p>"My rules" lists every rule and every site with access, each with a remove button. Export and import your rules as a JSON file. Undo on any page in one click.</p><span class="go">How &rarr;</span></a>
-    <a class="card" href="permissions/index.html"><span class="tag">Built</span><h3>Say exactly what it may touch</h3><p>Four permissions, each explained with Chrome's own words. No host permissions at install, no remote code, no network. The validator in the repo refuses a build that breaks any of this.</p><span class="go">The permissions &rarr;</span></a>
+    <a class="card" href="permissions/index.html"><span class="tag">Built</span><h3>Say exactly what it may touch</h3><p>Five permissions, each explained with Chrome's own words. No host permissions at install, no remote code, no network. The validator in the repo refuses a build that breaks any of this.</p><span class="go">The permissions &rarr;</span></a>
   </div>
 </section>
 
@@ -64,7 +64,7 @@
   <h2>New in 0.2: the playground, and a policy for every script</h2>
   <p class="blurb">Write a small fix as a script, tick what it may do, run it on a page, see exactly what it did, undo it, keep it. The script runs in a sandbox with nothing in it but the capabilities you ticked, and every call is checked against the policy before it reaches the page. A fix that may only set the title cannot do anything else, whatever it says.</p>
   <div class="cards">
-    <a class="card" href="use/playground/index.html"><span class="tag">Built</span><h3>The playground</h3><p>Eight capabilities, each reversible: read or set the title, read the URL, count, read or replace an element's text, hide elements, add a stylesheet. Saved experiments live in your browser; export them as a file to share.</p><span class="go">How it works &rarr;</span></a>
+    <a class="card" href="use/playground/index.html"><span class="tag">Built</span><h3>The playground, beside the page</h3><p>Opens in Chrome's side panel next to the page it works on, and follows you from tab to tab. Eight capabilities, each reversible: read or set the title, read the URL, count, read or replace an element's text, hide elements, add a stylesheet. Saved experiments live in your browser; export them as a file to share.</p><span class="go">How it works &rarr;</span></a>
     <a class="card" href="articles/script-behaviour-policies/index.html"><span class="tag">Article</span><h3>Script Behaviour Policies</h3><p>The Agent Behaviour Policy model applied to a line of JavaScript: what the script may do (the mandate), what a script on a page can do (the grant), the difference, and where each line is enforced. Static review and runtime enforcement, both.</p><span class="go">Read &rarr;</span></a>
     <a class="card" href="admin/plans/index.html"><span class="tag">Plan</span><h3>Splitting the extension from the site, and a library of fixes</h3><p>The extension becomes its own repository with its own releases; this site stays the page; a third repository holds generic and site-specific fixes, each a small application with a policy, tests and a review.</p><span class="go">The plan &rarr;</span></a>
   </div>
@@ -115,10 +115,10 @@
 
 <footer class="site"><div class="cols">
   <div>
-    <div class="brandline">fix-the-page<span>.chrome-extensions.sgit.ai</span></div>
+    <div class="brandline">fix-the-page<span>.chrome-extension.sgit.ai</span></div>
     <p>A Chrome extension that fixes the page you are on, only when you ask, and can say exactly what it changed. One generic extension, built on <code>activeTab</code>, starting with the tab's title. Code Apache 2.0; content CC BY 4.0.</p>
     <p class="partnote">Published by the sgit project. The extension makes no network calls and sends nothing anywhere; this site is static and has no analytics.</p>
-    <p class="verline">site and extension <a href="admin/versions.html" data-site-version>v0.2.0</a> · <a href="releases/fix-the-page-v0.2.0.zip">download fix-the-page-v0.2.0.zip</a> · <a href="index.md">this page as markdown</a></p>
+    <p class="verline">site and extension <a href="admin/versions.html" data-site-version>v0.3.0</a> · <a href="releases/fix-the-page-v0.3.0.zip">download fix-the-page-v0.3.0.zip</a> · <a href="index.md">this page as markdown</a></p>
   </div>
   <div>
     <h4>The extension</h4>

@@ -16,7 +16,7 @@
     name: $('name'), match: $('match'), script: $('script'), example: $('example'), caps: $('caps'), limitCalls: $('limit-calls'), limitMs: $('limit-ms'),
     lint: $('lint'), run: $('run'), undo: $('undo'), undoAll: $('undo-all'), save: $('save'), newBtn: $('new'), message: $('message'), log: $('log'),
     experiments: $('experiments'), experimentsEmpty: $('experiments-empty'), sideMessage: $('side-message'), exportBtn: $('export'), importFile: $('import-file'),
-    policyJson: $('policy-json'), copy: $('copy'), sandbox: $('sandbox'), tpl: $('experiment-row')
+    policyJson: $('policy-json'), copy: $('copy'), sandbox: $('sandbox'), tpl: $('experiment-row'), openInTab: $('open-in-tab')
   };
 
   const EXAMPLES = [
@@ -30,10 +30,12 @@
   ];
 
   let tab = null;
+  let panelMode = false;     // no ?tabId: this is the side panel, and it follows the active tab
   let currentId = null;      // the saved experiment being edited, or null
-  let run = null;            // { runId, started }
+  let run = null;            // { runId, tabId, started }
   let sandboxReady = false;
   let runCounter = 0;
+  const runTabs = {};        // runId -> tabId, so Undo reaches the tab the run was on
 
   function say(target, text, isError) { target.textContent = text || ''; target.classList.toggle('err', !!isError); }
   function logLine(text, cls) {
@@ -116,10 +118,11 @@
 
   /* ---------------------------------------------------------- the run */
 
-  function sendToTab(msg) {
+  function sendToTab(msg, tabId) {
     return new Promise((resolve) => {
-      if (!tab) return resolve({ ok: false, error: 'no tab' });
-      chrome.tabs.sendMessage(tab.id, msg, (res) => {
+      const id = tabId || (tab && tab.id);
+      if (!id) return resolve({ ok: false, error: 'no tab' });
+      chrome.tabs.sendMessage(id, msg, (res) => {
         if (chrome.runtime.lastError) resolve({ ok: false, error: chrome.runtime.lastError.message });
         else resolve(res || { ok: false, error: 'no answer from the page' });
       });
@@ -130,7 +133,7 @@
     try {
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['engine.js'] });
       return true;
-    } catch (e) { say(el.message, 'Cannot reach the tab: ' + (e.message || e) + '. Go back to it, open the popup there and choose Playground again.', true); return false; }
+    } catch (e) { say(el.message, 'Cannot reach the tab: ' + (e.message || e) + '. Click the Fix the Page icon on that page and press "Open the playground" again; the click is what lets the extension see the tab.', true); return false; }
   }
 
   async function startRun() {
@@ -143,7 +146,8 @@
     if (run) { el.sandbox.contentWindow.postMessage({ type: 'sbp:stop' }, '*'); }
     if (!(await ensureEngine())) return;
     const runId = 'r' + (++runCounter) + '-' + Date.now().toString(36);
-    run = { runId, policy: p.policy, calls: 0, refused: 0, started: Date.now() };
+    run = { runId, tabId: tab.id, policy: p.policy, calls: 0, refused: 0, started: Date.now() };
+    runTabs[runId] = tab.id;
     el.log.textContent = '';
     logLine('run ' + runId + ' under policy [' + p.policy.capabilities.join(', ') + '] on ' + tab.url, 'note');
     el.sandbox.contentWindow.postMessage({ type: 'sbp:run', runId, script: el.script.value, capabilities: p.policy.capabilities, limits: p.policy.limits }, '*');
@@ -162,7 +166,7 @@
       logLine('refused ' + describeCall(call) + ': more than ' + run.policy.limits.calls + ' calls', 'refused');
       return reply(msg, { ok: false, error: 'refused: too many calls' });
     }
-    const res = await sendToTab({ type: 'ftp:cap', runId: run.runId, name: call.name, args: call.args });
+    const res = await sendToTab({ type: 'ftp:cap', runId: run.runId, name: call.name, args: call.args }, run.tabId);
     if (res && res.ok) {
       logLine(describeCall(call) + ' → ' + JSON.stringify(res.value), 'ok');
       reply(msg, { ok: true, value: res.value });
@@ -185,7 +189,7 @@
       logLine('ended with an error after ' + ms + ' ms: ' + msg.error + ' (' + r.calls + ' call(s) applied, ' + r.refused + ' refused)', 'refused');
       say(el.message, 'The script stopped: ' + msg.error, true);
     }
-    const eff = await sendToTab({ type: 'ftp:cap-effects', runId: r.runId });
+    const eff = await sendToTab({ type: 'ftp:cap-effects', runId: r.runId }, r.tabId);
     if (eff && eff.ok) (eff.effects || []).forEach((e) => logLine('effect: ' + JSON.stringify(e), 'note'));
     el.undo.dataset.runId = r.runId;
   }
@@ -284,7 +288,7 @@
   el.undo.addEventListener('click', async () => {
     const id = el.undo.dataset.runId;
     if (!id) { say(el.message, 'Nothing to undo yet.'); return; }
-    const r = await sendToTab({ type: 'ftp:cap-undo', runId: id });
+    const r = await sendToTab({ type: 'ftp:cap-undo', runId: id }, runTabs[id]);
     say(el.message, r && r.ok ? 'Undid run ' + id + '.' : 'Could not undo: ' + (r && r.error), !(r && r.ok));
     logLine('undo ' + id, 'note');
   });
@@ -309,26 +313,71 @@
   el.limitMs.addEventListener('input', refreshLint);
 
   // For the automated tests: run without a click, and read the log.
-  window.ftpPlayground = { startRun, loadExperiments, fillForm, lint: () => el.lint.textContent, log: () => [...el.log.children].map((li) => li.textContent) };
+  window.ftpPlayground = { startRun, loadExperiments, fillForm, resolveTab, tab: () => tab, lint: () => el.lint.textContent, log: () => [...el.log.children].map((li) => li.textContent) };
+
+  /* ---------------------------------------------------------- the tab */
+
+  function showTab(why) {
+    if (tab) {
+      el.restricted.hidden = true;
+      el.page.hidden = false;
+      el.pageTitle.textContent = tab.title || '(no title)';
+      el.pageUrl.textContent = tab.url;
+    } else {
+      el.page.hidden = true;
+      el.restricted.hidden = false;
+      el.restrictedWhy.textContent = why;
+    }
+    el.openInTab.hidden = !(panelMode && tab);
+    refreshLint();
+  }
+
+  // Bound mode (?tabId=): one tab, chosen by the popup. Panel mode: whatever tab is active in this window,
+  // as long as the extension may see it. It may see a tab after the icon was clicked on it (activeTab) or
+  // on a site allowed with "Always on this site"; otherwise Chrome gives no URL, and the panel says so.
+  async function resolveTab() {
+    const params = new URLSearchParams(location.search);
+    let t = null;
+    try {
+      if (params.has('tabId')) t = await chrome.tabs.get(Number(params.get('tabId')));
+      else [t] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    } catch (e) { t = null; }
+    const visible = !!(t && t.url && /^https?:\/\//.test(t.url));
+    const previous = tab && tab.id;
+    tab = visible ? t : null;
+    if (!visible) {
+      showTab(params.has('tabId') ? 'That tab is gone, or Chrome does not allow extensions on it.'
+        : t && t.url ? 'Chrome does not allow extensions on this page.'
+        : 'Click the Fix the Page icon on the page you want to work on, then "Open the playground"; the click is what lets the extension see the tab. A site allowed with "Always on this site" is always visible.');
+      return;
+    }
+    showTab();
+    if (tab.id !== previous) {
+      const suggested = core.patternForUrl(tab.url) || '*://*/*';
+      if (!el.match.value.trim() || el.match.dataset.suggested === el.match.value.trim()) { el.match.value = suggested; refreshLint(); }
+      el.match.dataset.suggested = suggested;
+      if (previous) logLine('now working on ' + tab.url, 'note');
+    }
+  }
 
   /* ---------------------------------------------------------- start */
 
   async function init() {
     buildCaps();
     const params = new URLSearchParams(location.search);
-    try {
-      if (params.has('tabId')) tab = await chrome.tabs.get(Number(params.get('tabId')));
-    } catch (e) { tab = null; }
-    if (tab && (!tab.url || !/^https?:\/\//.test(tab.url))) tab = null;
-    if (!tab) {
-      el.restricted.hidden = false;
-      el.restrictedWhy.textContent = params.has('tabId') ? 'That tab is gone, or Chrome does not allow extensions on it.' : 'The playground was opened on its own.';
-    } else {
-      el.page.hidden = false;
-      el.pageTitle.textContent = tab.title || '(no title)';
-      el.pageUrl.textContent = tab.url;
+    panelMode = !params.has('tabId');
+    document.body.classList.toggle('panel', panelMode);
+    el.openInTab.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      if (tab) chrome.tabs.create({ url: chrome.runtime.getURL('playground.html?tabId=' + tab.id) });
+    });
+    fillForm({ match: '', policy: sbp.emptyPolicy() });
+    await resolveTab();
+    if (panelMode) {
+      chrome.tabs.onActivated.addListener(() => resolveTab());
+      chrome.tabs.onUpdated.addListener((id, info, t) => { if (t && t.active && (info.status === 'complete' || info.url || info.title)) resolveTab(); });
+      chrome.windows.onFocusChanged.addListener(() => resolveTab());
     }
-    fillForm({ match: tab ? core.patternForUrl(tab.url) || '*://*/*' : '*://*/*', policy: sbp.emptyPolicy() });
     await renderExperiments();
   }
   init();

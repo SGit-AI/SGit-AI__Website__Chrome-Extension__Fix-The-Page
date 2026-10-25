@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Fix the Page",
-  "version": "0.2.0",
-  "description": "Fix the page you are on, only when you ask: the tab's title, and a playground for your own fixes under a policy. No network, no telemetry.",
-  "homepage_url": "https://fix-the-page.chrome-extensions.sgit.ai/",
+  "version": "0.3.0",
+  "description": "Fix the page you are on, only when you ask: the tab's title, and a side-panel playground for your own fixes under a policy. No network, no telemetry.",
+  "homepage_url": "https://fix-the-page.chrome-extension.sgit.ai/",
   "minimum_chrome_version": "116",
-  "permissions": ["activeTab", "scripting", "storage", "contextMenus"],
+  "permissions": ["activeTab", "scripting", "storage", "contextMenus", "sidePanel"],
   "optional_host_permissions": ["https://*/*", "http://*/*"],
   "background": { "service_worker": "service-worker.js", "type": "module" },
   "action": { "default_popup": "popup.html", "default_title": "Fix the Page: set this tab's title", "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" } },
   "options_ui": { "page": "options.html", "open_in_tab": true },
+  "side_panel": { "default_path": "playground.html" },
   "commands": {
     "_execute_action": { "suggested_key": { "default": "Alt+Shift+T" }, "description": "Fix the Page: set this tab's title" }
   },

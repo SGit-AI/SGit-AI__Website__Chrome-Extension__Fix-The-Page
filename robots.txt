@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://fix-the-page.chrome-extensions.sgit.ai/sitemap.xml
+Sitemap: https://fix-the-page.chrome-extension.sgit.ai/sitemap.xml

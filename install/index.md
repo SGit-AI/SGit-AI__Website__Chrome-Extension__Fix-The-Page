@@ -1,6 +1,6 @@
 # Install
 
-https://fix-the-page.chrome-extensions.sgit.ai/install/ · [as HTML](index.html) · site v0.1.0
+https://fix-the-page.chrome-extension.sgit.ai/install/ · [as HTML](index.html) · site v0.1.0
 
 Fix the Page is installed by loading it unpacked, from a clone of its repository or from the release zip. Chrome shows no "read and change all your data" warning, because the extension asks for none of that.
 
@@ -15,7 +15,7 @@ To update: `git pull`, then the reload arrow on the extension's card.
 
 ## Route B: from the release zip
 
-1. Download [fix-the-page-v0.2.0.zip](../releases/fix-the-page-v0.2.0.zip) and [its SHA-256](../releases/fix-the-page-v0.2.0.zip.sha256). Check with `shasum -a 256 fix-the-page-v0.2.0.zip` against the hash on the [source page](../source/index.md).
+1. Download [fix-the-page-v0.3.0.zip](../releases/fix-the-page-v0.3.0.zip) and [its SHA-256](../releases/fix-the-page-v0.3.0.zip.sha256). Check with `shasum -a 256 fix-the-page-v0.3.0.zip` against the hash on the [source page](../source/index.md).
 2. Unzip into a folder you will keep.
 3. `chrome://extensions`, Developer mode.
 4. Load unpacked, and pick the unzipped folder (the one with `manifest.json`).

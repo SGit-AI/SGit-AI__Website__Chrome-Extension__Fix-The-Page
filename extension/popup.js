@@ -11,10 +11,11 @@
     restricted: $('restricted'), restrictedWhy: $('restricted-why'), error: $('error'), errorText: $('error-text'), main: $('main'),
     pageTitle: $('page-title'), pageUrl: $('page-url'), siteApi: $('site-api'), applied: $('applied'),
     form: $('form'), value: $('value'), mode: $('mode'), preview: $('preview'), match: $('match'), always: $('always'),
-    apply: $('apply'), undo: $('undo'), message: $('message'), version: $('version'), rulesLink: $('rules-link'), playgroundLink: $('playground-link')
+    apply: $('apply'), undo: $('undo'), message: $('message'), version: $('version'), versionPill: $('version-pill'), rulesLink: $('rules-link'), playgroundLink: $('playground-link'), openPanel: $('open-panel')
   };
   const manifest = chrome.runtime.getManifest();
   el.version.textContent = 'v' + manifest.version;
+  el.versionPill.textContent = 'v' + manifest.version;
 
   let tab = null;
   let status = null;
@@ -112,6 +113,15 @@
   el.playgroundLink.addEventListener('click', (ev) => {
     ev.preventDefault();
     chrome.tabs.create({ url: chrome.runtime.getURL('playground.html' + (tab && tab.id ? '?tabId=' + tab.id : '')) });
+  });
+  // The side panel: the playground beside the page. sidePanel.open "may only be called in response to a
+  // user action"; this click is one. The icon click that opened this popup granted activeTab for the tab,
+  // so the panel can see it.
+  el.openPanel.addEventListener('click', async () => {
+    try {
+      await chrome.sidePanel.open(tab && tab.id ? { tabId: tab.id } : { windowId: chrome.windows.WINDOW_ID_CURRENT });
+      window.close();
+    } catch (e) { say('Could not open the side panel: ' + (e.message || e) + '. Chrome 116 or newer is needed; "Open in a tab" works everywhere.', true); }
   });
 
   el.form.addEventListener('submit', async (ev) => {
